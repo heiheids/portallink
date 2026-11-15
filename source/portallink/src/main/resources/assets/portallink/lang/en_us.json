@@ -1,0 +1,68 @@
+{
+  "modmenu.nameTranslation.portallink": "Nether Portal Mapping",
+  "modmenu.descriptionTranslation.portallink": "Preview how nether portals link across dimensions: draws the range a gate claims, its partner's position and portal numbers, and flags the gates that would send you to the wrong destination.",
+    "key.category.portallink.main": "Nether Portal Mapping",
+  "key.categories.portallink": "Portal Link",
+  "key.portallink.toggle": "Toggle portal markers",
+  "key.portallink.panel": "Toggle status list",
+  "key.portallink.config": "Open settings",
+
+  "portallink.warn.conflict": "Portal at %d, %d, %d leads to %d, %d, %d, which does not lead back - you may be sent to the wrong portal.",
+  "portallink.warn.conflict_numbered": "Portal #%d at %d, %d, %d leads to #%d at %d, %d, %d, which does not lead back - you may be sent to the wrong portal.",
+
+  "portallink.dim.overworld": "Overworld",
+  "portallink.dim.nether": "Nether",
+
+  "portallink.range.claims": "Build in range -> links to %d, %d, %d",
+  "portallink.range.new_gate": "A new portal will spawn in this range",
+
+  "portallink.status.linked": "Linked",
+  "portallink.status.conflict": "Wrong destination",
+  "portallink.status.will_create": "New portal",
+  "portallink.status.unknown": "Unknown",
+
+  "portallink.label.header": "%s",
+  "portallink.label.numbered": "#%d %s",
+  "portallink.label.partner_numbered": "-> #%d %d, %d, %d (%d blocks)",
+  "portallink.label.partner": "-> %s %d, %d, %d (%d blocks)",
+  "portallink.label.will_create": "-> new portal at %d, %d, %d",
+
+  "portallink.hud.title": "Portals: %d",
+  "portallink.hud.line_linked": "%s  %d,%d,%d → %d,%d,%d (%d)",
+  "portallink.hud.line_open": "%s  %d,%d,%d → %d,%d,%d",
+  "portallink.hud.line_linked_numbered": "%s  #%d  %d,%d,%d → #%d %d,%d,%d (%d)",
+  "portallink.hud.line_open_numbered": "%s  #%d  %d,%d,%d → %d,%d,%d",
+
+  "portallink.command.header": "Portal Link - %d portal(s) in range",
+  "portallink.command.scanning": "Scanning portals...",
+  "portallink.command.empty": "No nether portal found nearby. Move closer and run /portallink rescan.",
+  "portallink.command.incomplete": "The other dimension is not loaded, so links may be incomplete.",
+  "portallink.command.line_linked": "%s %d,%d,%d → %d,%d,%d (%d blocks)",
+  "portallink.command.line_open": "%s %d,%d,%d → nothing, new portal at %d,%d,%d",
+  "portallink.command.rescanned": "Rescanned: %d link(s), %d here, %d in the other dimension.",
+  "portallink.command.enabled": "Portal Link enabled.",
+  "portallink.command.disabled": "Portal Link disabled.",
+
+  "portallink.config.title": "Nether Portal Mapping Settings",
+  "portallink.config.master": "Portal Link",
+  "portallink.config.master.on": "Portal Link: ON",
+  "portallink.config.master.off": "Portal Link: OFF",
+  "portallink.config.master.tip": "Master switch for all markers.",
+  "portallink.config.language": "Language",
+  "portallink.config.ranges": "Ranges",
+  "portallink.config.labels": "Labels",
+  "portallink.config.connectors": "Connectors",
+  "portallink.config.always_on_top": "See through",
+  "portallink.config.panel": "Status list",
+  "portallink.config.warn": "Warnings",
+  "portallink.config.distance": "Render distance",
+  "portallink.config.max_portals": "Max portals",
+  "portallink.config.label_scale": "Label scale",
+  "portallink.config.rescan": "Rescan",
+  "portallink.config.footer.author": "Author: 黑山大叔",
+  "portallink.config.footer.links": "bilibili.com/19428259  ·  github.com/heiheids",
+
+  "portallink.lang.auto": "Follow game",
+  "portallink.lang.zh_cn": "Chinese",
+  "portallink.lang.en_us": "English"
+}

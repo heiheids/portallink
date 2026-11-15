@@ -1,0 +1,37 @@
+# ---- 工程内工具链与缓存（体积大，不入库）----
+/toolchain/
+/.gradle-home/
+/source/portallink/.gradle/
+/source/portallink/build/
+/lib-build/
+/skills_extracted/
+
+# ---- 运行与测试产物 ----
+/source/portallink/run/
+/source/portallink/build/run/
+
+# ---- 临时文件与日志 ----
+/tmp/
+/logs/
+
+# ---- 备份（zip 是二进制快照，用《下界门映射工程备份.txt》记录即可）----
+/backup/
+
+# ---- 第三方参考工程（他人源码，不入库、不发布）----
+/临时文件/
+
+# ---- 本地参考 jar 与配置备份 ----
+/mod/
+*.bak
+
+# ---- 系统文件 ----
+Thumbs.db
+desktop.ini
+.DS_Store
+*.iml
+.idea/
+
+# 注意：docs/INDEX.md 要入库（它是索引），不要忽略。
+
+# ---- 发布产物（用 GitHub Releases 挂附件，不入库）----
+/*.zip

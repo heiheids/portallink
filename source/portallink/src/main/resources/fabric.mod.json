@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "portallink",
+	"version": "${version}",
+	"name": "Portal Link (Nether Portal Linkage Preview)",
+	"description": "Preview how nether portals link across dimensions: renders linkage ranges, partner positions and per-portal labels so you never get routed to the wrong portal again.",
+	"authors": [
+		"黑山大叔"
+	],
+	"contact": {
+		"homepage": "https://space.bilibili.com/19428259",
+		"sources": "https://github.com/heiheids"
+	},
+	"license": "MIT",
+	"icon": "assets/portallink/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.heishan.portallink.PortalLinkInit"
+		],
+		"client": [
+			"com.heishan.portallink.client.PortalLinkClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.0",
+		"minecraft": ">=26.3 <26.4",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

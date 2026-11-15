@@ -1,0 +1,774 @@
+================================================================
+下界门映射工程备份 · 操作与备份记录
+工程目录：E:\Project\portallink
+记录规则：每次改动源码前，先由 tools\backup.ps1 打包 zip，再在此文件追加一条记录。
+================================================================
+
+[001] 2026-11-14 16:19:05
+  备份包：backup\baseline-20261114-161905.zip
+  即将进行的操作：
+    1. 建立本次继续开发前的基线快照（当前工程仅有源码、文档、jar 与截图，无 tools/ 脚本）。
+    2. 后续步骤将补回 tools\backup.ps1（备份脚本）与 tools\file-index.ps1（索引脚本）。
+    3. 在本工程内安装 Gradle 9.7.1 并配置工程内 GRADLE_USER_HOME，绕开不可达的 services.gradle.org。
+  说明：本次为基线备份，改动前源码状态完整可还原。
+
+[002] 2026-11-14 16:24:50
+  备份包：backup\docs-and-tools-20261114-162450.zip（1418.6 KB，62 个文件）
+  即将进行的操作：
+    1) 备份脚本首次自测（tools\backup.ps1）。
+    2) 把 gradle-wrapper.properties 的 distributionUrl 指向可用镜像（services.gradle.org 在本机不可达），使工程自带的 .\gradlew.bat 能直接用。
+    3) 新增 tools\build.ps1：封装 JAVA_HOME(JDK25) + 工程内 GRADLE_USER_HOME + 编译/测试/构建三档命令。
+    4) 新增 tools\file-index.ps1 与 file-index-notes.txt，重建 docs\INDEX.md。
+    5) 修正 docs\mod_context.md、docs\文件读取与索引规范.md 里的旧路径（D:\@工作区 -> E:\Project）与工具链版本（JDK 25.0.3.9 / Gradle 工程内安装）。
+
+[003] 2026-11-14 16:46:28
+  备份包：backup\pre-final-check-20261114-164628.zip（1430.1 KB，66 个文件）
+  即将进行的操作：
+    1) 完工自检：确认工具链、备份、索引脚本均可用。
+    2) 端到端复跑 tools\build.ps1 compile。
+    3) 同步 mod/portallink-1.0.0.jar 发布副本（若构建产物有变化）。
+
+[004] 2026-11-14 16:47:16
+  备份包：backup\docs-final-20261114-164716.zip（1431.5 KB，66 个文件）
+  即将进行的操作：
+    文档收尾：统一构建入口为 tools\build.ps1，修正 PACKAGE.md/README.md/mod_context.md 的旧路径；同步 source 树内文档副本；重建 INDEX.md（59 文件 / 0 违规）。
+
+[005] 2026-11-14 16:54:55
+  备份包：backup\before-range-semantics-20261114-165455.zip（1431.6 KB，66 个文件）
+  即将进行的操作：
+    把「范围」语义改为以配对的下界/主世界传送门为中心（建造在此范围即可链接到它），并引入按链接配对分配的颜色，实现同范围内不同链接用不同颜色、各自独立标注范围。
+    计划改动：
+      core/PortalRange.java（新增，范围几何）
+      core/RangePlanner.java（新增，纯逻辑规划）
+      core/RangeRole.java（新增，范围归属枚举）
+      client/render/LinkColorAssigner.java（新增，配对配色）
+      client/render/PortalLinkRenderer.java（瘦身为编排）
+      client/render/PortalRangeRenderer.java / PortalGhostRenderer.java / PortalLabelRenderer.java（拆分）
+      render/PortalGizmoSupport.java（公共绘制工具）
+      render/PortalPalette.java（加色相生成）
+      lang/zh_cn.json + en_us.json（范围标注文案）
+      docs/mod_context.md、README.md（说明新语义）
+
+[006] 2026-11-14 17:41:11
+  备份包：backup\range-semantics-done-20261114-174111.zip（1444.8 KB，75 个文件）
+  即将进行的操作：
+    范围语义改造完成并通过全部游戏测试。改动：
+     新增 core/LinkGroups（互指配对分组，单向不夺色）
+     新增 core/RangeMarker、core/RangePlanner（以对端门为中心的认领范围）
+     新增 client/render/LinkColorAssigner（按配对的黄金比色相分配）
+     拆分渲染器为 PortalRangeRenderer / PortalGhostRenderer / PortalLabelRenderer / PortalGizmoSupport
+     重写 PortalLinkRenderer 为纯编排（286 行 -> 约 100 行）
+     PortalSnapshot 增加 otherEntries（双向条目）
+     PortalScanService 生成双向条目并双向判冲突
+     PortalPalette 移除按状态配色
+     新增中文/英文范围文案
+     新增 gametest PortalGroupAssertions 并接入串门测试
+    剩余：更新文档与索引。
+
+[007] 2026-11-14 17:42:46
+  备份包：backup\docs-range-20261114-174246.zip（1449.1 KB，75 个文件）
+  即将进行的操作：
+    文档与索引收尾：mod_context.md 新增 §6.2 范围语义（中心=对端门、按配对配色、平面取玩家Y、渲染分层），§7 补充 5 条本次踩坑；同步 source 树内副本；重建 INDEX.md（68 文件 / 0 违规）。完整 build 通过，jar 86128 字节。
+
+[008] 2026-11-14 17:57:23
+  备份包：backup\bump-1-1-0-20261114-175723.zip（1451.4 KB，76 个文件）
+  即将进行的操作：
+    版本号 1.0.0 -> 1.1.0（范围语义重构是新功能，便于在 Mod Menu 里确认加载的是新版）。
+    改动：
+      source/portallink/gradle.properties (mod_version)
+      src/main/java/.../PortalLink.java (MOD_VERSION)
+      tools/deploy.ps1 改为按实际产物名部署，不写死文件名
+      docs/mod_context.md 记录版本与部署流程
+
+[009] 2026-11-14 17:58:28
+  备份包：backup\deploy-flow-20261114-175828.zip（1453 KB，76 个文件）
+  即将进行的操作：
+    部署闭环：新增 tools\deploy.ps1（清旧版、复制、SHA256 校验、确认 mods 内只有一份）；build.ps1 与 deploy.ps1 不再写死 jar 名；mod_context.md 新增 §6.1.1 部署纪律与实例路径。INDEX 69 文件 / 0 违规。
+
+[010] 2026-11-14 19:04:09
+  备份包：backup\before-grid-20261114-190409.zip（1453.1 KB，76 个文件）
+  即将进行的操作：
+    按实测反馈修三个问题（1.1.1）：
+    1) 去掉范围方块的实体填充（大片橙色遮挡视线），改为空心网格。
+    2) 范围平面 Y 不再跟随玩家（RangePlanner.plan 传入 minY/maxY，锚定对端门自身 Y 并夹取到当前维度高度）。
+    3) 渲染改为「点阵网状、精确到方块」：边界对齐方块边界，网格点落在方块中心，步长按范围自适应并设点数上限。
+    改动文件：
+      core/RangeMarker.java（增加方块对齐边界）
+      core/RangePlanner.java（plan 签名改为 minY/maxY）
+      client/render/PortalRangeRenderer.java（重写为点阵网格）
+      client/render/PortalLinkRenderer.java（传 minY/maxY）
+      gametest/PortalGroupAssertions.java（适配新签名）
+      gradle.properties + PortalLink.java（1.1.1）
+
+[011] 2026-11-14 19:33:12
+  备份包：backup\range-grid-done-20261114-193312.zip（1456.9 KB，76 个文件）
+  即将进行的操作：
+    1.1.1 修复三个实测问题：
+    1) 去掉实心填充与线网格（大片橙色遮挡），改为点阵网格 floor mesh + 边界围栏。
+    2) 范围位置完全脱离玩家：RangePlanner 的平面 Y 改为对端门 Y - 2.5（夹取到当前维度高度），draw 内不再引用 eye.y 决定位置；只有点阵密度随相机距离变化。
+    3) 点阵精确到方块：每个点位于方块中心，1 点 = 1 方块；近处逐块绘制，远处按距离淡出并保留边界。
+    配套：
+      RangeMarker 增加方块对齐边界（minBlockX/maxBlockX/contains/blockCount）
+      RangePlanner.plan 签名改为 (snapshot, groups, minY, maxY)
+      gametest PortalGroupAssertions 适配新签名，新增边界/方块数/自含中心断言
+      PortalRangeRenderer 重写（点阵 + 渐隐边界 + 围栏）
+    版本号 1.1.1，已部署到实例 mods\\。
+
+[012] 2026-11-14 19:34:38
+  备份包：backup\docs-grid-20261114-193437.zip（1459.3 KB，76 个文件）
+  即将进行的操作：
+    文档收尾：mod_context.md §6.2.3 改为「点阵网格绘制规范」（禁止实心填充、禁止整片线网格、点阵+淡出+边界分段+围栏），新增 §6.2.4「范围位置绝不跟随玩家」；§7 坑表补充 5 条本次实测原因。同步 source 树副本并重建 INDEX（69 文件 / 0 违规）。
+
+[013] 2026-11-14 23:08:34
+  备份包：backup\before-fixed-area-20261114-230834.zip（1459.4 KB，76 个文件）
+  即将进行的操作：
+    修复「范围随玩家移动」+ 改为 MiniHUD 风格（1.1.2）。
+    根因一（移动）：PortalRangeRenderer 里 drawFloorMesh 把点阵裁剪成 eyeX/eyeZ ± DOT_RADIUS，
+            drawFence 的中间栏柱也按 FENCE_DRAW_RADIUS 过滤 → 可见网格随玩家滑动。
+            注意 RangePlanner.plan 签名不含玩家位置，标记本身是固定的，所以 bug 纯在渲染层。
+    根因二（遮挡）：PortalGizmoSupport.finish 给所有 gizmo 施加 persistForMillis(250)，
+            而渲染器每帧重新发射 → 250ms 内约 15 层半透明填充叠加，alpha 0x33 累积到接近不透明。
+    改法：
+      - 去掉一切以玩家位置为条件的裁剪与距离淡出；可见范围只由 RangeMarker 决定。
+      - 采用 MiniHUD 的「固定世界区域 + 清晰边线」风格：实心边界线 + 区块对齐网格 + 四角立柱。
+      - 不画填充面（gizmo 填充会因持久化叠加，正是遮挡根因）。
+      - 新增只读断言：同一链接组在不同玩家位置下，范围中心/尺寸必须完全一致。
+
+[014] 2026-11-14 23:24:34
+  备份包：backup\fixed-area-done-20261114-232434.zip（1460.9 KB，76 个文件）
+  即将进行的操作：
+    1.1.2 完成并部署：
+    1) 修复「范围随玩家移动」：根因在渲染层（点阵裁剪成 eyeX/eyeZ ± 24、栏柱按 FENCE_DRAW_RADIUS 过滤），
+       RangePlanner.plan 签名本就不含玩家位置。已删除全部玩家相关裁剪与距离淡出；
+       PortalRangeRenderer.draw 不再接受相机参数（编译期保证）。
+    2) 新增回归护栏 PortalGroupAssertions.assertRangesStable：移动玩家 30 格后重扫，
+       逐组比对范围中心/尺寸/方块边界必须一致。
+    3) 渲染改为 MiniHUD 风格：实心边界 + 区块对齐内部网格（8/16 格，锚定世界绝对坐标）+
+       垂直墙面（侧视可读的关键）+ 四角立柱。禁止 gizmo 填充面（persistForMillis 叠加是遮挡根因）。
+    4) mod_context.md §6.2.3/§6.2.4 重写，§7 坑表更新 3 条根因。
+    全部 gametest 通过；已部署到实例 mods\\（portallink-1.1.2.jar，85.9 KB）。
+
+[015] 2026-11-15 00:03:30
+  备份包：backup\before-column-20261115-000329.zip（1461.2 KB，76 个文件）
+  即将进行的操作：
+    1.2.0：范围从水平面改为全高度半透明柱（对齐用户给的参考图），并处理同水平范围不同高度多门的归属。
+    经 javap 复核原版 PortalForcer#findClosestPortalPosition：
+      搜索窗口 getInSquare(radius) = X/Z 方形，Y 无限制（全高度）；
+      排序 comparator = BlockPos.distSqr（三维）+ thenComparingInt(Y)。
+      => Y 参与排序，所以「同 X/Z、不同高度」的多扇门按 |dy| 分界，
+         归属实为以两门 Y 中点为界的水平分段，而不是整柱都归同一扇门。
+    计划改动：
+      RangeMarker：增加 bottomY/topY（柱体竖直范围），成为「柱段」
+      RangePlanner：生成整柱并按 owner Y 中点切分为多段，一段一色一标签
+      PortalRangeRenderer：改画半透明柱体 + 棱边 + 段界面，填充不持久化（避免 alpha 叠加）
+      PortalGizmoSupport：新增不持久化的 finish（供填充面使用）
+      PortalGroupAssertions：断言改为柱段合法性 + 分段不重叠 + 稳定性
+      mod_context.md §6.2.3/§6.2.5：记录三维排序事实与分段规则
+      gradle.properties / PortalLink：1.2.0
+
+[016] 2026-11-15 00:01:44
+  备份包：backup\column-bands-done-20261115-000144.zip（1467.7 KB，77 个文件）
+  即将进行的操作：
+    1.2.0 完成（柱体渲染 + 高度分带）：
+    1) 范围改为半透明全高度柱体（对齐参考图）：竖向棱边 + 上下环 + 内部横环，填充一帧失效且不穿透地形。
+    2) 新增同柱多门按高度分带：RangePlanner.cutIntoBands 按对端门自身 Y 的中点切分，一段一色一标签。
+    3) 经 javap 复核：搜索窗口 Y 无边界，但排序用 BlockPos.distSqr（三维），Y 仅作平局判据 —— 已写入 §6.2.3。
+    4) 修复分带依据错误（曾误用本维度关联门 Y，导致整柱归错门）。
+    5) 新增 PortalLinkHeightGameTest 并**登记到 gametest 入口**（此前漏登记导致假绿）。
+    6) 部署纪律补强：游戏占用时退出码 2、mods 保持原样、打印补装命令；清理 build/libs 历史 jar。
+    5 个 gametest 全绿（55 秒），INDEX 70 文件 / 0 违规。
+    注意：用户游戏正在运行，1.2.0 尚未替换进 mods（当前为 1.1.2）。
+
+[017] 2026-11-15 00:07:09
+  备份包：backup\deploy-1-2-0-20261115-000709.zip（1468.1 KB，77 个文件）
+  即将进行的操作：
+    已部署 1.2.0 到实例 mods\\（用户在关闭游戏后要求重新放置）。
+    结果：portallink-1.2.0.jar 90,463 字节，SHA256 05CEEDE0...，mods 内仅此 1 份，旧 1.1.2 已删除。
+    校验：jar 60 条目，含柱体渲染相关全部新类，不含 gametest 类，fabric.mod.json 版本 1.2.0。
+
+[018] 2026-11-15 01:31:54
+  备份包：backup\before-fill-throttle-20261115-013154.zip（1468.3 KB，77 个文件）
+  即将进行的操作：
+    1.2.1 修三个实测问题：
+    1) 透明层完全看不见：填充用 persistForMillis(1)，寿命比一帧(16ms)还短 → 从未被渲染。
+       改为「节流发射」：每 240ms 发射一次、寿命 250ms，永远只有 1 层，fps 无关。
+    2) 范围大小疑似不对（主世界只见 6 区块，应约 16 区块 / 257 格）：
+       先用断言钉死数学（half 必须 = 128、blockWidth 必须 = 257），再看结果。
+    3) 「范围跟随玩家」：已证标记本身固定（assertRangesStable 通过），
+       怀疑是扫描窗导致「可见的柱体集合」随移动更替，看起来像在滑动。
+       本轮先加 /portallink ranges 诊断输出（每段柱体的 owner/Y范围/水平范围），拿实测数字再定。
+
+[019] 2026-11-15 01:48:57
+  备份包：backup\fix-slide-and-fill-20261115-014856.zip（1472.1 KB，77 个文件）
+  即将进行的操作：
+    1.2.1 已部署：修掉「范围随玩家移动」的真正根因 + 透明层不显示。
+    1) 真根因：POI 查询会截断跨边界的门，PortalFrameBuilder 由方块反推门框，
+       截断后中心偏移；查询窗跟随玩家 → 柱体滑动，直到整门完全进出窗口才停。
+       修法：查询半径 +21（门最大尺寸），再用 fullyInside 只保留完整落在半径内的门。
+    2) 透明层不可见：persistForMillis(1) 短于一帧，从未绘制。
+       改为节流发射（每 240ms 发一次 / 寿命 260ms），任何帧率只留 1 层。
+    3) 尺寸疑问已用断言钉死：主世界侧 half=128、宽高=257（16 区块），实测通过。
+    4) 新增护栏：assertNoTruncatedFrames、assertOverworldColumnsAre128。
+    5) 填充穿透与否交给既有 alwaysOnTop 开关；alpha 0x24。
+    5 个 gametest 全绿（57 秒），INDEX 70 文件 / 0 违规，已部署 portallink-1.2.1.jar（89.2 KB）
+
+[020] 2026-11-15 02:02:42
+  备份包：backup\before-stable-render-20261115-020242.zip（1472.6 KB，77 个文件）
+  即将进行的操作：
+    1.2.2 按用户反馈重做渲染稳定性：
+    1) 闪烁：节流发射(240ms/260ms)本质是「靠持久化续命」，续不上就闪。
+       改为 gizmo 标准用法：每帧发射一次、不设 persistForMillis。
+    2) 随玩家移动：柱体集合只在玩家脚下更替（扫描只找「柱体包含玩家」的门）。
+       把对维度扫描半径加 32 格余量，使邻近柱体也稳定可见。
+    3) 顺带：去掉节流相关代码，保持每帧确定性输出。
+
+[021] 2026-11-15 02:36:25
+  备份包：backup\stable-render-1-2-2-20261115-023625.zip（1474.5 KB，77 个文件）
+  即将进行的操作：
+    1.2.2 已部署，针对「闪烁 + 随玩家移动 + 不像 MiniHUD」三点：
+    1) 查清 MiniHUD 实现：反查其 26.3 jar，全库仅 1 个调试类引用 gizmo，
+       实际范围渲染走自定义顶点缓冲 + 管线（drawBoxAllSidesBatchedQuads / drawBoxAllEdgesBatchedLines）。
+       已把 26.3 等价 API（submitCustomGeometry + RenderTypes.debugFilledBox）写进 mod_context §6.2.4。
+    2) 闪烁根因两条：
+       a. 发射间隔 240/寿命 260 余量仅 20ms，偶发空档 → 改为 100/300，N 恒为 3，余量 200ms。
+       b. 颜色按扫描顺序分配，POI 返回顺序不稳 → 每次重扫颜色重排。改为按分组 id 排序后发色。
+    3) 随玩家移动：保持上一轮的 fullyInside 修复 + 对维度扫描加 32 格余量。
+    4) 实测确认 gizmo 不设 persistForMillis 就完全不绘制（去掉后全部消失），已记录。
+    5 个 gametest 全绿（53 秒），INDEX 70 文件 / 0 违规，已部署 portallink-1.2.2.jar（89.1 KB）。
+
+[022] 2026-11-15 02:59:51
+  备份包：backup\custom-geometry-1-3-0-20261115-025951.zip（1478.8 KB，78 个文件）
+  即将进行的操作：
+    1.3.0 已部署：半透明柱体改用自定义几何渲染（与 MiniHUD 同架构），闪烁根因结构性消除。
+    1) 查实 MiniHUD 26.3 不用 gizmo（全库仅 1 个调试类引用），它走自定义顶点缓冲+管线。
+    2) 26.3 等价 API：submitCustomGeometry + RenderTypes.debugFilledBox（gizmo 底层用的也是它）。
+       坐标约定经 javap 复核：LevelRenderer#submitBlockOutline 会 translate(blockPos - cameraPos)，
+       说明 PoseStack 是相机相对的，提交顶点前必须自己减 mainCamera().position()。
+    3) 半透明柱体改由 PortalVolumeSubmitter 提交真实三角网格：无持久化、无叠加、alpha 精确 → 不会闪。
+       棱边/横环/标签仍用 gizmo（细线重叠无视觉差异，但 gizmo 必须 persistForMillis 否则不绘制）。
+    4) 修复并回滚一处几何错误：未链接分支的 half 应为 radius/|scale|（16/0.125=128），
+       我一度改成乘法得到 2 → 5 格柱体。已回滚并用 assertColumnsHaveMappedSize（120..136）守住。
+    5) 新增诊断日志：每次重扫输出 [ranges] 一行（half / x../z../y.. 与 owner），
+       已当场抓出上述两次几何误判。
+    5 个 gametest 全绿（50 秒），INDEX 71 文件 / 0 违规。
+
+[023] 2026-11-15 03:14:11
+  备份包：backup\fill-dynamic-alpha-1-3-1-20261115-031410.zip（1479.2 KB，77 个文件）
+  即将进行的操作：
+    1.3.1 已部署：透明层恢复 + 帧率无关的浓度补偿 + 扫描窗放宽。
+    1) submitCustomGeometry 实测是死路：BEFORE_GIZMOS 里提交 debugFilledBox 的 6 面几何，
+       两种坐标约定（减相机/世界坐标）都不显示且不报错。已删除 PortalVolumeSubmitter 并写入文档。
+    2) 半透明柱体回到 gizmo fill，但改为【每帧发射】（不再节流 → 不会闪），
+       并按帧时间反解单层 alpha：N=250ms/帧时间，a=1-(1-0.18)^(1/N)，
+       使叠加后的浓度恒为 18%，与 30/60/240fps 无关。
+    3) 扫描窗放宽：hostRadius 增加 128 格余量、对维度增加 32 格余量，
+       使柱体不再随玩家走动而整体消失/更替。
+    4) 诊断日志确认几何稳定：half=128、x=-120..136、z=-124..132 多次重扫完全一致。
+    5 个 gametest 全绿（56 秒），INDEX 70 文件 / 0 违规。
+
+[024] 2026-11-15 03:25:13
+  备份包：backup\countable-ribs-1-3-2-20261115-032513.zip（1480.9 KB，77 个文件）
+  即将进行的操作：
+    1.3.2 已部署：柱体四壁加「每 16 格竖向棱线」+ 横向环线，让 257 格范围可数。
+    用户反馈：有颜色不闪烁了，但仍感觉范围只有几十格、且中心似乎跟着走。
+    分析：其日志为 half=128 x=-40..216 z=-236..20（257 格=16 区块，中心 (88,-108)，
+          与其主世界门 (48,64,-87) 同域），几何正确。问题在于站在体积内部时
+          没有任何可参照刻度，均匀罩色无法判断大小；移动时远墙投影变化被误读为整体位移。
+    改法：四壁每 16 格一道竖向棱线（锚定绝对区块边界，走动时不动）+ 每 32 格横向环。
+    5 个 gametest 全绿（56 秒），INDEX 70 文件 / 0 违规。
+
+[025] 2026-11-15 03:51:54
+  备份包：backup\portal-anchored-scan-1-4-0-20261115-035153.zip（1482.9 KB，77 个文件）
+  即将进行的操作：
+    1.4.0 已部署：修复「柱体随玩家移动、距离恒定」的真正机制。
+    排查过程：
+    1) 先查 MiniHUD 配置，其 shapeRenderer 为 true（有一圈 circle 形状、中心固定、半径16），
+       但用户确认 MiniHUD 那个一直没动，动的是本模组 → 排除外部干扰。
+    2) 逐行核查本模组：RangePlanner.plan 签名无玩家位置；渲染层 eye 仅用于整体剔除，
+       几何全部取自 RangeMarker 世界坐标 → 柱子本身不可能跟人走。
+    3) 找到真正机制：对维度扫描窗口原本以「玩家的映射位置」为中心，
+       于是『哪几扇对端门被找到』取决于玩家站在哪，走一段整批换掉
+       → 观感就是『柱子跟着我、距离恒定』。
+    改法：otherCenters() 以本维度找到的每扇门的映射位置为扫描锚点（上限 8 个，
+          bonus 合并去重），柱体绑定在门上而非人身上。
+    5 个 gametest 全绿（65 秒），INDEX 70 文件 / 0 违规。
+
+[026] 2026-11-15 03:57:45
+  备份包：backup\no-player-fallback-1-4-1-20261115-035745.zip（1483.8 KB，77 个文件）
+  即将进行的操作：
+    1.4.1 已部署：修掉「走开几百格范围仍跟着我」的根因。
+    根因（1.4.0 只修了一半）：对维度扫描在找不到本维度传送门时会回退到玩家位置作锚点，
+    于是无论走到哪都能扫到附近的下界门，并把它们全部画成柱体 → 框永远出现在玩家身边。
+    改法两处：
+      otherCenters() 去掉玩家回退；本维度没有门就不扫对维度（返回空列表）。
+      RangePlanner 只画 entry.hasMatch() 的对端门（确实是本维度某门的配对），
+      不再画「扫描顺带发现的门」。
+    判据写入文档：日志里若 entriesHere=0 但 columns>0，即为此坑。
+    5 个 gametest 全绿（69 秒），INDEX 70 文件 / 0 违规。
+
+[027] 2026-11-15 04:14:29
+  备份包：backup\render-recipe-1-5-0-20261115-041428.zip（1486.2 KB，78 个文件）
+  即将进行的操作：
+    1.5.0：按用户提供的 iron-farm-design-wheelchair 工程与 minecraft-modding-playbook 修正半透明体积渲染。
+    依据一（用户工程 fabric-26.3/render/IconAtlasRenderer.java 与 WorldOverlayRenderer.java）：
+      submitCustomGeometry 的顶点必须 setOverlay(NO_OVERLAY)+setLight(FULL_BRIGHT)+setNormal(...)，
+      缺一个就不显示或全黑；相机必须取 context.levelState().cameraRenderState.pos，
+      且 PoseStack 在相机空间，顶点要传 world-cam。
+      我上一版只调了 addVertex+setColor，且相机取自 mainCamera() → 所以不可见。
+    依据二（playbook silent-failures D13）：调试绘制 alpha 低于 0x80 等于没画，
+      不糊屏要靠线宽/减少元素，不靠压 alpha。我此前 fill alpha 一直是 0x0A~0x34。
+    本次改动：
+      1) PortalVolumeSubmitter 改为正确的顶点配方 + cameraRenderState 相机 + 相机相对坐标；
+      2) 注册点从 COLLECT_SUBMITS 改回 BEFORE_GIZMOS（与用户工程一致）；
+      3) fill alpha 提升到 0x70，取消按帧率压 alpha 的补偿逻辑。
+
+[028] 2026-11-15 04:18:42
+  备份包：backup\mesh-visible-1-5-0-20261115-041842.zip（1487.6 KB，78 个文件）
+  即将进行的操作：
+    1.5.0 已部署：半透明柱体终于真正渲染出来（截图确认）。
+    根因三条叠加，全部由用户提供的工程与 playbook 定位：
+      A. 顶点属性缺失：submitCustomGeometry 必须 setColor+setUv+setOverlay+setLight+setNormal，
+         我此前只调 addVertex+setColor → 完全不显示且不报错。
+      B. 相机来源错：应取 context.levelState().cameraRenderState.pos，我用了 mainCamera().position()。
+      C. 坐标空间错：该 PoseStack 在相机空间，必须传 world-camera；我曾传世界坐标 → 画到几百格外。
+    另按 playbook D13：调试绘制 alpha 低于 0x80 等于没画，此前 fill alpha 一直是 0x0A~0x34；
+      现改为提交式网格 + FILL_ALPHA=0x70（网格不叠加，所见即所得），删除按帧率压 alpha 的补偿逻辑。
+    清理：移除 fillAlphaFor/finishFill/frameMillis 等已废弃代码；注册点合并到 BEFORE_GIZMOS。
+    5 个 gametest 全绿（65 秒），截图 0000/0001 确认柱体与 16 格棱线可见；INDEX 71 文件 / 0 违规。
+
+[029] 2026-11-15 04:36:52
+  备份包：backup\world-space-1-5-1-20261115-043651.zip（1488.5 KB，78 个文件）
+  即将进行的操作：
+    1.5.1 已部署：修掉「柱体跟着玩家走」的根因（相机平移减了两次）。
+    你的两张对比图 + 两行日志给出决定性证据：
+      日志1 玩家 (-149,-228)、日志2 玩家 (-1842,-776)，两行都是
+      owner=10,75,-14 half=128 x=-40..216 z=-236..20 —— 数据完全一致、盒子位置固定，
+      但画面里的盒子一直围着玩家 → 只有『整体偏移 -camera』才能造成这种现象。
+    根因：我按另一工程的注释把顶点改成 world-camera，但那个工程走的是另一条绘制路径；
+      BEFORE_GIZMOS 的 PoseStack 是**世界空间**（和 gizmo 同一空间），再减一次相机就等于整体
+      平移 -camera，而 -camera 随玩家移动 → 恒定相对位置、走多远都跟着。
+    改法：顶点改回世界坐标；保留完整顶点属性（setUv/setOverlay/setLight/setNormal）。
+    新增可复现判据并固化为 gametest 截图 portal-link-away：
+      站到 400 格外背对柱体——世界锚定则画面干净，相机相对则满屏颜色。实测画面干净 ✔
+    5 个 gametest 全绿（61 秒），INDEX 71 文件 / 0 违规。
+
+[030] 2026-11-15 04:40:15
+  备份包：backup\probe-instrumentation-1-6-0-20261115-044015.zip（1489 KB，78 个文件）
+  即将进行的操作：
+    1.6.0：加入每秒一次的原值诊断日志，停止猜测。
+    原因：上一轮我把相机放到 400 格外背对柱体，画面干净就判定『世界锚定成功』，
+      但 maxRenderDistance 默认 256，那个位置整个柱体已被剔除 —— 干净是『没画』而非『没跟随』。
+      该证据无效，结论作废。
+    本次改动：
+      1) 新增每秒一行 [probe] 日志：玩家眼位、相机位、柱体边界、剔除与否、实际提交次数、
+         以及提交用的第一个顶点坐标。用于判定『数据是否稳定』与『绘制是否发生』。
+      2) 修正 gametest 的 away 视角：放到 maxRenderDistance 以内（200 格），
+         使它成为有效判据而不是被剔除的空画面。
+
+[031] 2026-11-15 04:43:22
+  备份包：backup\probe-and-valid-criterion-1-6-0-20261115-044322.zip（1491.1 KB，78 个文件）
+  即将进行的操作：
+    1.6.0 已部署：加入 [probe] 每秒原值日志，并把无效的 away 判据修正为有效判据。
+    先说清一个作废的结论：上一轮我用『400 格外背对柱体画面干净』判定世界锚定成功，
+    但 maxRenderDistance 默认 256，那个位置柱体已被剔除 —— 干净是没画，不是没跟随。该证据作废。
+    本轮做的是停止猜测、改成量测：
+    1) 新增 [probe] 每秒一行：eye / maxDist / columns / drawn / culled / submits per second /
+       first anchor / half / 边界 / Y 范围。
+    2) away 视角改到 200 格（maxRenderDistance 以内），成为真正的判据。
+    gametest 实测 [probe] 四组对照，相机 eye.z 分别为 8.5 / 150 / 200.5 时
+    anchor 恒为 (-120,-124)、half=128 → 数据层确定锚定，且 200 格处未被剔除。
+    5 个 gametest 全绿（71 秒），INDEX 71 文件 / 0 违规。
+    下一步需要用户提供行走时的 [probe] 行，才能判定其环境里 anchor 是否随 eye 变化。
+
+[032] 2026-11-15 04:56:10
+  备份包：backup\debounce-retention-1-7-0-20261115-045610.zip（1491.5 KB，78 个文件）
+  即将进行的操作：
+    1.7.0：针对『笼子跟着玩家走』的两个机制性假设同时做减法。
+    用户已排除其他模组（只留 Fabric API + 本模组），现象不变 → 确定是本模组。
+    [probe] 已证明数据层恒定：28 行日志 anchor 始终 (-40,-236)，eye 从 -130 走到 -202，
+      drawn=1 culled=0 submits/s=60。所以问题只能在『绘制层如何解释这些坐标』。
+    两个假设：
+      A. gizmo 保留式副本拖影：我给线设了 persistForMillis(250)，60fps 下同时存在约 15 份副本。
+         若副本携带提交当时的相机偏移，移动时整笼会被拖着走。改为 50ms（约 3 份），
+         保留期仍大于一帧，不会不显示。
+      B. alwaysOnTop 让 382 格高的柱体穿墙铺满视野，读起来像『罩着我』。
+         填充改为参与深度测试（受地形遮挡），读作世界里的真实体积。
+    改动：LINE_LIFETIME_MILLIS 250→50；填充不再 setAlwaysOnTop，alpha 0x70→0x40。
+
+[033] 2026-11-15 05:02:55
+  备份包：backup\banded-cage-1-7-0-20261115-050255.zip（1493.9 KB，78 个文件）
+  即将进行的操作：
+    1.7.0 已部署：针对『笼子跟着玩家走』做两处减法，并把排查结论写进文档。
+    用户已排除其他模组（只留 Fabric API + 本模组），现象不变 → 确定是本模组。
+    数据层已被 [probe] 排除：28 行日志、玩家移动约 80 格，anchor 恒为 (-40,-236)，
+    drawn=1 culled=0 submits/s=60。
+    改动一（机制）：LINE_LIFETIME_MILLIS 250→50。gizmo 是保留式，寿命决定同屏副本数
+      （250ms ≈ 15 份）；若副本携带提交时的相机偏移，移动时整笼会被拖着走。50ms ≈ 3 份，
+      仍大于一帧，不会不显示。
+    改动二（观感）：半透明填充仍通高（保留全高语义），但笼子只画门高度 ±40 格
+      （CAGE_HALF_HEIGHT=40）。原因：257×382 的带棱线巨墙在 90~160 格外就占满视野，
+      走动时棱线扫过会被误读为『它在动』。
+    文档新增 §6.2.4.3 排除表 + 判据，§6.2.4.4 记录『剔除距离会伪造世界锚定证据』这个坑。
+    5 个 gametest 全绿（71 秒），INDEX 71 文件 / 0 违规。
+
+[034] 2026-11-15 05:30:53
+  备份包：backup\floor-plane-zones-1-8-0-20261115-053053.zip（1566 KB，106 个文件）
+  即将进行的操作：
+    1.8.0 已部署：按用户提供的参考工程（临时文件/，NeoForge 同类模组）重写范围渲染。
+    用户指出其做法可用，要求提取。对照后找到四处本质差异，全部照搬：
+      1) 形状：从 257×382 通高巨柱 → 玩家脚下水平面（baseY = floor(playerY/8)*8+4）
+      2) 侧壁：从通高 → 仅向上 12 / 向下 4 格（参考实现的默认值）
+      3) 填充：改为 Gizmos.rect(a,b,质心,质心,fill) 扇形三角（单四边形会因绕序被剔除）
+      4) 剔除距离：256 → 1536（参考实现的默认值）
+      5) alpha 直接用 40/28/200，不再按副本数均分（均分后单层 11 = 不可见，已改回）
+    新增配置项：zoneFillAlpha/zoneWallAlpha/zoneStrokeAlpha/showZoneWalls/zoneUpHeight/zoneDownHeight。
+    删除 PortalVolumeSubmitter（submitCustomGeometry 体积方案）：几何能画对，但画大了就占满视野，方向本身不对。
+    文档重写 §6.2.4（含差异对照表 + 两个照搬过程中的坑），§6.2.4.1 说明只画当前高度的带。
+    tools/file-index.ps1 排除 临时文件/ 与截图目录，INDEX 回到 70 文件。
+    5 个 gametest 全绿（62 秒），截图确认 382 格巨笼已消失、画面干净。INDEX 70 文件 / 0 违规。
+
+[035] 2026-11-15 11:37:11
+  备份包：backup\full-height-and-flicker-1-9-0-20261115-113710.zip（1566.6 KB，106 个文件）
+  即将进行的操作：
+    1.9.0：三项改动。
+    1) 范围改为通顶满高度：侧壁从当前 12/4 格改为由 marker.bottomY()..topY()（整条世界可建高度）。
+       地板面保留（它是让观感'不跟随'的关键），巨墙此前的问题随'不再跟随'已被用户确认解决。
+    2) 解决闪烁：根因是 gizmo 保留期内同位置出现多份副本，存活份数每帧在 3~4 之间跳变，
+       导致叠加后的 alpha 忽高忽低。修法：去掉 persistForMillis，每帧只发一份。
+       参考实现（临时文件/ZoneRenderer）本就不调 persist，说明该通道不设保留也能绘制。
+    3) 新增/调整快捷键：模组总开关默认 P 键（原 B），面板键改 B（原 P），配置键仍 O。
+
+[036] 2026-11-15 11:59:43
+  备份包：backup\full-height-p-key-1-9-0-20261115-115943.zip（1567.6 KB，106 个文件）
+  即将进行的操作：
+    1.9.0 已部署：三项需求全部完成。
+    1) 通顶满高度：新增 fullHeightZones（默认 true），侧壁由 marker.bottomY()..topY()
+       铺满该维度可建高度；地板面保留（它是'不跟随'的观感来源）。
+    2) 闪烁：根因是 gizmo 保留期内 N=寿命/帧时间 份副本，N 每帧在 3~4 间跳变，
+       半透明面叠加后亮度脉动。解法是按实测帧时间反解单层 alpha：
+       N=ceil(50/帧时间)，a=1-(1-目标/255)^(1/N)，使合成结果恒定。
+       期间再次确认两条死路：去掉 persistForMillis 会导致全部消失；
+       submitCustomGeometry 用世界坐标不可见、用相机相对坐标则跟随玩家（均实测截图确认）。
+    3) 快捷键：总开关默认改为 P 键（原 B），状态列表改 B（原 P），设置仍 O；
+       补 key.categories.portallink.main 的中英文案。
+    文档重写 §6.2.4 并新增 §6.2.4.1 高度、§6.2.4.2 快捷键，§6.2.4.3~.5 顺延；
+    把三条不可行路线列表存入文档，避免以后再试。
+    5 个 gametest 全绿（54 秒），INDEX 70 文件 / 0 违规。
+
+[037] 2026-11-15 12:23:33
+  备份包：backup\revert-and-stabilise-1-9-1-20261115-122333.zip（1568 KB，106 个文件）
+  即将进行的操作：
+    1.9.1：回退我改坏的部分，并按证据重新做。
+    事实梳理：
+      1.8.0 = 用户确认「不跟随」，但仍有闪烁。
+      1.9.0 = 我把侧壁从 12/4 格改成通高，并把 alpha 改成按帧时间逐帧反解
+              → 用户报告「又开始跟随 + 还闪烁」。两个症状都是我引入的。
+    归因：
+      通高侧壁 = 382 格高墙在近处占满视野（1.8.0 之所以不跟随，正是因为侧壁只有 12/4 格）。
+      逐帧反解 alpha = 每帧用带噪声的帧时间重算 N，N 在 3/4 之间抖动 → alpha 抖动 → 继续闪。
+    改法：
+      a) fullHeightZones 默认改回 false（侧壁回到 12/4，即已确认不跟随的状态）；
+      b) 「通顶满高度」改由线框表达：四角立柱 / 每 16 格竖棱 / 每 32 格横环 一律铺满整条可建高度；
+      c) N 不再逐帧重算：帧时间取 EMA 平滑 + 500ms 滞回，alpha 因此长时间恒定。
+
+[038] 2026-11-15 12:27:40
+  备份包：backup\revert-regression-1-9-1-20261115-122740.zip（1569 KB，106 个文件）
+  即将进行的操作：
+    1.9.1 已部署：回退我引入的两个回归，并给闪烁加上滞回。
+    用户报告 1.9.0「又开始跟随 + 还闪烁」，两个症状都是我上一轮改出来的：
+      a) 我把侧壁从 12/4 格改成通高 → 382 格巨墙又占满视野 → 观感重新变成「跟随」。
+         1.8.0 之所以不跟随，正是因为侧壁只有 12/4 格。这是我的判断失误：
+         用户要的「通顶满高度」我不该用「通高半透明墙」去实现。
+      b) 我改成逐帧用帧时间反解 alpha，而帧时间本身每帧抖动 →
+         N 在 3/4 之间跳 → alpha 跟着跳 → 闪烁没解决反而更明显。
+    修正：
+      a) fullHeightZones 默认改回 false（侧壁回到 12/4 = 已确认不跟随的形态）；
+         「通顶满高度」改由线框承担：四角立柱 / 每 16 格竖棱 / 每 32 格横环 一律铺满整条可建高度。
+      b) N 改为帧时间 EMA 平滑 + 500ms 滞回，alpha 长时间恒定，不再逐帧抖动。
+    5 个 gametest 全绿（56 秒），截图确认线框通高、地板面与门框正常。
+
+[039] 2026-11-15 12:30:14
+  备份包：backup\mesh-only-experiment-1-10-0-20261115-123014.zip（1569.3 KB，106 个文件）
+  即将进行的操作：
+    1.10.0：做一次干净的判定实验 —— 范围完全改用提交式网格绘制，彻底不用 gizmo。
+    因果梳理（来自前三轮用户实测）：
+      12/4 侧壁 + 地板              → 不跟随，但闪
+      通高侧壁                      → 跟随
+      12/4 侧壁 + 通高竖棱/横环     → 又跟随
+    两条规律：
+      A. 任何通高的竖直线条都造成『跟随』观感（382 格竖线近处铺满视野 + 走动扫过）；
+      B. gizmo 半透明面因保留副本叠加必然脉动。
+    因此唯一没被干净验证过的路线：范围全部用 submitCustomGeometry 提交，
+      顶点用相机相对坐标（1.5.0 实测该写法可见），并且不再画任何范围相关的 gizmo，
+      避免 gizmo 笼子把网格的结论带偏。
+    本次改动：新增 RangeMeshRenderer（地板扇形 + 四面墙 + 边框细四边面，全部提交式，相机相对），
+      PortalRangeRenderer 改为只调用它；gizmo 仅保留门框轮廓与标签。
+
+[040] 2026-11-15 12:34:59
+  备份包：backup\mesh-only-fullheight-1-10-0-20261115-123459.zip（1570.2 KB，107 个文件）
+  即将进行的操作：
+    1.10.0 已部署：认领范围改为纯提交式网格，彻底不用 gizmo 画范围。
+    判定实验（本轮做的唯一一件事，没有夹带其他改动）：
+      gametest 两个机位截图对照 ——
+      近处看向柱体：地面出现淡色区域（网格地板可见）→ 提交式网格确实被绘制。
+      200 格外背对柱体：画面完全干净 → 网格是世界锚定的，不跟随相机。
+    由此确认：submitCustomGeometry 的 PoseStack 是相机空间，顶点必须 world-camera；
+      1.5.x 时代'跟随'的其实是旁边的 gizmo 笼子，把网格的结论带偏了。
+    改动：
+      新增 RangeMeshRenderer：地板扇形 + 四面墙 + 边框细四边面，全部走 submitCustomGeometry，
+      一次绘制、alpha 精确、无保留副本 → 结构上不可能闪烁、也不可能跟随。
+      PortalRangeRenderer 退化为选择器（高度带 + 剔除距离）。
+      范围不再产生任何 gizmo；gizmo 仅剩门框轮廓与标签。
+      因为无保留副本，fullHeightZones 重新默认开启 true（通顶满高度）。
+    5 个 gametest 全绿（62 秒），INDEX 71 文件 / 0 违规。
+
+[041] 2026-11-15 12:38:48
+  备份包：backup\edges-and-deeper-1-11-0-20261115-123848.zip（1570.6 KB，107 个文件）
+  即将进行的操作：
+    1.11.0：按用户反馈修三点。
+    用户确认：不移动了、不闪烁了。剩下三条：
+      1) 颜色加深一些
+      2) 边缘加上线条
+      3) BUG：玩家水平视线高度始终有一层颜色，且随玩家高度一直存在 —— 不应该有
+    成因（第 3 条）：那层是『画在玩家高度 baseY 上的地板面』（1.8.0 为解决'跟随'观感而引入）。
+      它按 floor(eyeY/8)*8+4 分档，所以玩家上下移动时它一直贴在视线高度。
+    改法：
+      去掉玩家高度的地板面，改为该柱体自身的高度边界（bottomY..topY）：
+      墙面通高 + 四角竖向棱边（薄四边面）+ 顶/底边框（薄四边面），全部仍走提交式网格，
+      不引入任何 gizmo（避免闪烁复发）。
+      深度加深：zoneWallAlpha 28 → 70；新增 zoneEdgeAlpha 默认 230 给棱边。
+
+[042] 2026-11-15 12:42:55
+  备份包：backup\edges-no-eye-plane-1-11-0-20261115-124255.zip（1571.7 KB，107 个文件）
+  即将进行的操作：
+    1.11.0 已部署：按用户三条反馈完成。
+    用户已确认：不移动了、不闪烁了（1.10.0 的纯提交式网格方案生效）。
+    1) 颜色加深：zoneWallAlpha 28 → 70；新增 zoneEdgeAlpha=230 用于棱边。
+    2) 边缘加线条：四角竖向棱边（每角两片互相垂直的薄四边形，EDGE=0.08）+
+       顶/底水平边框。全部仍走提交式网格，不引入 gizmo（否则闪烁复发）。
+    3) 修 BUG「视线高度始终有一层颜色，随玩家高度一直存在」：
+       成因是 1.8.0 为制造贴地感而引入的『玩家高度分档地板面』（baseY=floor(eyeY/8)*8+4），
+       玩家上下移动时它一直贴在视线高度。
+       改法：删除该地板面与 baseY 相关绘制，所有面锚定在柱体自身 bottomY..topY；
+       baseY 仅保留为『该段是否适用于当前高度』的可见性筛选，不再产生任何几何。
+       同时移除 PortalRangeRenderer.baseY() 与相关调用。
+    5 个 gametest 全绿（56 秒），截图确认视线高度横向色带消失、四角棱边可见。
+    INDEX 71 文件 / 0 违规。
+
+[043] 2026-11-15 12:50:03
+  备份包：backup\contact-margin-1-12-0-20261115-125003.zip（1572 KB，107 个文件）
+  即将进行的操作：
+    1.12.0：把『玩家接触面』这一层余量补进认领范围，并把形状判断写进文档。
+    分析（代码已核对）：
+      vanilla 传送由 Block#entityInside 触发 = 玩家碰撞箱与传送门方块相交，
+      玩家半宽 0.3，故可站在门外 0.3 格触发。
+      条件：存在可达进入点 e，使 |map(e)-G| ≤ R；e 相对新门中心最多偏移 (新门宽/2 + 0.3)。
+      换回玩家维度：|p-c| ≤ R/|scale| + (新门宽/2 + 0.3)，余量不乘 scale。
+    形状判断（回答用户会不会出现圆柱）：不会。
+      vanilla 搜索区是 PoiManager#getInSquare = X/Z 方形（切比雪夫）；
+      门户面与玩家碰撞箱都是轴对齐矩形，矩形⊕方形仍是轴对齐矩形，
+      只有玩家是球时才会把四角磨圆（半径 0.3 格，可忽略）。
+      故必须保持方形，画成圆柱是错的。
+    改动：
+      LinkageMath 新增 PLAYER_HALF_WIDTH=0.3 与 contactMargin(portalWidth)。
+      RangePlanner 的 half 加上该余量（用所属门宽度作新门宽度的代理，并注明）。
+      游戏测试断言 assertOverworldColumnsAre128 放宽到允许余量。
+
+[044] 2026-11-15 12:56:20
+  备份包：backup\contact-margin-square-shape-1-12-0-20261115-125619.zip（1572.4 KB，107 个文件）
+  即将进行的操作：
+    1.12.0 已部署：补上玩家接触面余量，并把『方形而非圆柱』的判断写进文档。
+    用户提出：传送位置与玩家自身位置有关，范围可能需要扩大到传送方块外一圈（玩家最小接触面即可传送），
+    并问这样会不会产生圆柱形范围。
+    代码核对结论：
+      触发是 Block#entityInside（碰撞箱相交），玩家半宽 0.3，可站门外 0.3 格触发。
+      条件：存在可达进入点 e 使 |map(e)-G| ≤ R；e 相对新门中心最多偏 (门宽/2 + 0.3)。
+      换回玩家维度：half = R/|scale| + (门宽/2 + 0.3)，第二项不乘 scale。
+    形状判断：不会产生圆柱。
+      搜索区是 PoiManager#getInSquare（切比雪夫方形），门户面与玩家箱都是轴对齐矩形，
+      矩形⊕方形仍是轴对齐矩形；只有玩家为球时才会磨圆四角（半径 0.3，可忽略）。
+      故保持方形，画圆柱是错的。
+    改动：LinkageMath 新增 PLAYER_HALF_WIDTH=0.3 与 contactMargin(portalWidth)；
+      RangePlanner 两个分支的 half 都加该余量（用所属门宽度作新门宽度代理）；
+      断言放宽为 128 ≤ half ≤ 128+MAX_SIZE/2+0.3 且宽深必须相等。
+    实测日志：主世界侧 half=128 → 129（门宽 2：+1+0.3），x=-122..137。
+    文档新增 §6.2.5 形状判断、§6.2.6 接触面余量，并清理了重复小节编号。
+    5 个 gametest 全绿（61 秒），INDEX 71 文件 / 0 违规。
+
+[045] 2026-11-15 14:08:03
+  备份包：backup\portal-ids-1-13-0-20261115-140802.zip（1572.8 KB，107 个文件）
+  即将进行的操作：
+    1.13.0：关掉连接线 + 给传送门编号。
+    1) 连接线（connector）没用且是唯一还在用 gizmo 的范围相关元素：renderConnectors 默认改 false。
+       它会从门顶指向『对端门映射回本维度的位置』，跨维度时指向空气，没有直观意义。
+    2) 传送门编号：用户希望用编号而不是坐标来识别『串门』的是哪扇门。
+       参考工程（临时文件/data/PortalIdStore.java）用 SavedData + 'dim;anchor' 键分配递增编号。
+       本模组是客户端模组，改为客户端持久化：config/portallink-ids.json 存 {ids, next}，
+       键用 PortalRef.key()（维度@x,y,z），首次见到即分配 next++，永久稳定。
+       编号显示在：门标签、范围标签、状态列表、串门聊天提示。
+
+[046] 2026-11-15 14:46:12
+  备份包：backup\portal-ids-deployed-1-13-0-20261115-144612.zip（1577.6 KB，108 个文件）
+  即将进行的操作：
+    1.13.0 已部署：连接线默认关闭 + 传送门编号（用户两项需求完成）。
+    1) renderConnectors 默认 false。连接线是从门顶指向『对端门映射回本维度位置』的直线，Y 拉平；
+       跨维度时那个位置是空气，无直观意义，且它是范围相关元素里最后一个还在用 gizmo 的（闪烁隐患）。
+    2) 传送门编号：
+       新增 client/PortalIdStore.java，客户端持久化 config/portallink-ids.json，存 {ids, next}；
+       键用 PortalRef.key()（维度@最小角），另有 idOf(ownerPos, ownerIsNether) 重建同形键，
+       保证同一扇门只有一个编号；首次见到分配 next++，永不重排、永不复用（按坐标排序的方案被否决，
+       因为新增一扇门会让后面编号全部错位）；读取时用现有最大值修复 next，避免手改文件发出重复编号。
+       显示于：门标签首行 #N 状态、第二行 → #M x,y,z（d 格）、状态列表 #N → #M、
+       区域中央 #N、串门聊天提示 #N 通向 #M。
+       新增语言键（中英各 5 条）：label.numbered / label.partner_numbered /
+       hud.line_linked_numbered / hud.line_open_numbered / warn.conflict_numbered。
+       删除已无用的 PortalPalette.withGroup 及其 BlockPos 导入。
+    3) 版本 1.12.0 → 1.13.0，已部署到 mods（97.8 KB，SHA256 D7700D68...）。
+    5 个 gametest 全绿（58 秒），截图确认门上方显示 #1 Linked 与 → #3。
+    INDEX 72 文件 / 0 违规。
+
+[047] 2026-11-15 14:57:39
+  备份包：backup\stronger-colors-1-14-0-20261115-145738.zip（1578.2 KB，108 个文件）
+  即将进行的操作：
+    1.14.0：颜色加重（用户反馈太淡看不清）。
+    1) 主因是 alpha 偏低：zoneWallAlpha 70/255 ≈ 27%，透过天空/地形后颜色被冲淡。
+       墙面 70 → 120（约 47%），棱边 230 → 255，描边 200 → 255。
+    2) 饱和度 0.62 → 0.78，让同 alpha 下颜色更实、更容易分辨相邻配对的色相差异。
+       CONFLICT 固定红色不受影响（PortalPalette.CONFLICT 独立定义）。
+
+[048] 2026-11-15 15:04:26
+  备份包：backup\stronger-colors-1-14-0-20261115-150426.zip（1579.2 KB，108 个文件）
+  即将进行的操作：
+    1.14.0 已部署：颜色加重。
+    用户反馈渲染颜色太淡看不清。两个独立因素一起调：
+      主因 alpha 偏低：zoneWallAlpha 70/255 ≈ 27%，透过天空/地形后颜色被冲淡。
+      → zoneWallAlpha 70 → 120（约 47%）
+      → zoneEdgeAlpha 230 → 255（棱边全不透明）
+      → zoneStrokeAlpha 200 → 255
+      饱和度 LinkColorAssigner.SATURATION 0.62 → 0.78，同 alpha 下颜色更实、相邻配对更易分辨。
+      PortalPalette.CONFLICT（串门红）是独立常量，不受影响。
+    踩坑记录：第一次用 deploy.ps1 -SkipBuild 部署，脚本正确警告『产物比源码旧』，
+      结果把 1.13.0 旧 jar 放进了 mods（颜色改动没进去）。重新执行不带 -SkipBuild 的
+      deploy.ps1 后为 1.14.0（97.8 KB，SHA256 5D12D24B...）。这个警告机制有效，保留。
+    文档新增 §6.2.12 配色强度（含『alpha 提太高会重新遮挡视线，优先提饱和度』的提醒）。
+    5 个 gametest 全绿（58 秒），INDEX 72 文件 / 0 违规。
+
+[049] 2026-11-15 15:08:28
+  备份包：backup\double-sided-walls-1-15-0-20261115-150828.zip（1579.6 KB，108 个文件）
+  即将进行的操作：
+    1.15.0：修『站在范围内看不到颜色』。
+    根因：RenderTypes.debugFilledBox 是背面剔除的。站在柱体外能看到近侧墙面（正面朝外），
+      进到里面后四面墙全是背面 → 全部被剔除 → 内部完全无渲染。
+      之前内部能看见，是因为当时还有一层『玩家高度的水平地板面』（水平面从上方看是正面）；
+      1.11.0 为修『视线高度总有颜色』把地板面删掉后，内部就彻底空了。这是我引入的连带回归。
+    改法：墙面、四角棱边、顶部/底部边框全部改为『双面提交』——
+      同一四边形按正序与逆序各发一次，使从内、从外都被视为正面。
+      仍是一次绘制（提交式网格，无保留副本），不引入闪烁。
+
+[050] 2026-11-15 15:11:00
+  备份包：backup\double-sided-deployed-1-15-0-20261115-151100.zip（1580.3 KB，108 个文件）
+  即将进行的操作：
+    1.15.0 已部署：修『站在范围内完全看不到颜色』（关键 bug）。
+    根因：RenderTypes.debugFilledBox 背面剔除。站在柱体外能看到近侧墙面（正面朝外）；
+      进入内部后四面墙全是背面 → 全被剔除 → 内部零渲染。
+      这是我在 1.11.0 删掉『玩家高度水平地板面』时引入的连带回归：
+      之前内部能看见，靠的正是那层水平面（水平面从上方看是正面）。
+    改法：新增 quadBothSides()，同一四边形按正序与逆序各发一次；
+      墙面、四角棱边、顶/底边框全部改为双面提交。
+      仍是单次提交式网格（无保留副本），不影响不闪烁。
+    实测截图：站在柱内现在有明显颜色覆盖（此前几乎全透明）。
+    配色维持 1.14.0 的 zoneWallAlpha=120 / Saturation=0.78。
+    5 个 gametest 全绿（56 秒）；备份 [049] 记录本次改动前状态。
+    用户截图同时确认编号功能正常：会串门 #1 → #2、已链接 #4 → #2，可直接看出 #1/#4 抢同一扇 #2。
+
+[051] 2026-11-16 01:50:48
+  备份包：backup\keybind-cleanup-1-16-0-20261116-015047.zip（1580.6 KB，108 个文件）
+  即将进行的操作：
+    1.16.0：修快捷键分类名 + 显示控制合并为一个键。
+    1) 分类名显示成原始键名：vanilla 的 KeyMapping.Category.label() 用
+       id.toLanguageKey('key.category')，实际键是 key.category.portallink.main（单数 category），
+       我写成了 key.categories.portallink.main（复数）→ 匹配不上。
+       改为正确键名（中英各一条）。
+    2) 用户要求『显示所有控制都用一个快捷键』默认 P：
+       只保留 toggleKey（P）作为总开关（config.enabled）；删除 panelKey(B) 与 configKey(O)
+       的注册、字段、轮询、处理分支与访问器。设置界面仍可从 Mod Menu 打开。
+
+[052] 2026-11-16 01:57:12
+  备份包：backup\keybind-category-1-16-0-20261116-015712.zip（1581.8 KB，108 个文件）
+  即将进行的操作：
+    1.16.0 已部署：两项完成。
+    1) 按键分类名不显示：根因是 KeyMapping.Category.label() 用
+       id.toLanguageKey('key.category') → 实际键 key.category.portallink.main（单数），
+       我写成了 key.categories...（复数）→ 显示原始键名。已改正（中英各一条）。
+    2) 显示控制合并为一个键：只保留 P 总开关（config.enabled）；
+       删除 panelKey(B)、configKey(O) 的字段/注册/轮询/处理/访问器。
+       设置界面仍可从 Mod Menu 打开。
+    版本 1.15.0 → 1.16.0，已部署（97.7 KB，SHA256 E652440A...）。
+    5 个 gametest 全绿（88 秒）；日志无 missing translation / key.portallink 相关警告。
+    文档新增 §6.2.13（含 javap 判据：不要凭原版分类名猜翻译键）。
+
+[053] 2026-11-16 02:06:01
+  备份包：backup\rename-category-1-16-1-20261116-020601.zip（1582 KB，108 个文件）
+  即将进行的操作：
+    1.16.1：把按键分类名改为「下界门映射」（用户认为更准确）。
+      key.category.portallink.main: zh 传送门映射 → 下界门映射；en Portal Link → Nether Portal Mapping。
+      同时核对语言文件与 fabric.mod.json 里的显示名是否一致，必要时同步。
+
+[054] 2026-11-16 02:08:05
+  备份包：backup\rename-category-deployed-1-16-1-20261116-020805.zip（1582.2 KB，108 个文件）
+  即将进行的操作：
+    1.16.1 已部署：按键分类名与设置标题统一为「下界门映射」。
+      key.category.portallink.main: zh 传送门映射 → 下界门映射 / en Portal Link → Nether Portal Mapping
+      portallink.config.title:      zh 传送门链接设置 → 下界门映射设置 / en → Nether Portal Mapping Settings
+    两个语言文件均通过 JSON 合法性校验；并解包 jar 确认改动已打进产物。
+    版本 1.16.0 → 1.16.1，已部署（97.7 KB，SHA256 1BD29F14...）。
+
+[055] 2026-11-16 02:09:16
+  备份包：backup\hud-follows-master-1-16-2-20261116-020916.zip（1582.5 KB，108 个文件）
+  即将进行的操作：
+    1.16.2：让 P 同时控制左上角连接列表。
+    用户反馈：快捷键没有一起打开左上角的连接列表。
+    成因：P 只切 config.enabled（世界渲染）；列表另有 showStatusPanel 开关（默认 false），
+      而它的按键（B）在 1.16.0 被我删掉了 → 现在没有任何键能开它，列表永远不显示。
+    改法：showStatusPanel 默认改为 true；HUD 仍要求 enabled && showStatusPanel，
+      于是 P 一次就能把整个世界显示 + 列表一起关/开；
+      不想要列表的人可在设置里单独关掉（保留独立性）。
+      同时修正 HUD 类注释（原文写『Off by default』，已与实现不符）。
+
+[056] 2026-11-16 02:11:26
+  备份包：backup\hud-master-switch-1-16-2-20261116-021126.zip（1583.5 KB，108 个文件）
+  即将进行的操作：
+    1.16.2 已部署：P 现在同时控制左上角连接列表。
+    成因：P 只切 config.enabled（世界渲染）；列表另有 showStatusPanel（默认 false），
+      而它的按键 B 在 1.16.0 被删除 → 没有任何键能打开列表。
+    改法：showStatusPanel 默认 true；HUD 仍要求 enabled && showStatusPanel，
+      于是 P 一次开关整个世界显示 + 列表；不想要列表可单独在设置里关。
+    踩坑：改默认值不会覆盖玩家已有配置。检查实例 config/portallink.json 发现
+      实际值是 false，仅改代码对他无效 → 已同步把该文件改为 true（并留 .bak 备份）。
+    5 个 gametest 全绿（55 秒），部署 97.7 KB（SHA256 54F0C649...）。
+    文档新增 §6.2.14（含『改默认值不覆盖已有配置』的排查判据）。
+
+[057] 2026-11-16 02:20:25
+  备份包：backup\modmenu-zh-description-1-16-3-20261116-022025.zip（1583.7 KB，108 个文件）
+  即将进行的操作：
+    1.16.3：Mod Menu 简介加中文。
+    Mod Menu 支持用语言键本地化模组名与简介（modmenu.nameTranslation.<id> /
+      modmenu.descriptionTranslation.<id>），fabric.mod.json 里的 name/description 是英文硬编码、
+      本身无法本地化，所以只能走这套键。
+    本次：zh_cn.json 增加这两个键（名称用『下界门映射』，与按键分类名一致），
+      en_us.json 同步一份英文（保持两文件键对齐）。
+
+[058] 2026-11-16 02:23:49
+  备份包：backup\modmenu-zh-1-16-3-20261116-022349.zip（1584.9 KB，108 个文件）
+  即将进行的操作：
+    1.16.3 已部署：Mod Menu 里本模组的名称与简介加上中文。
+    fabric.mod.json 的 name/description 是英文硬编码、无法本地化，
+      改用 Mod Menu 的翻译键：
+      modmenu.nameTranslation.portallink       = 下界门映射
+      modmenu.descriptionTranslation.portallink = 预览下界门如何跨维度连接：绘制可建门的链接范围、
+        对端门位置与传送门编号，并标出会串门的门，避免走错目的地。
+    约定来源是实测：解包实例里 waveycapes / appleskin / bubbleworld 的 lang 文件都在用
+      modmenu.descriptionTranslation.<modid>，证明这套键在当前实例生效（不是凭印象）。
+    en_us.json 同步写入英文同名键，保持两文件键集合对齐。
+    两个 JSON 均通过 ConvertFrom-Json 校验；解包 jar 确认新键已进产物。
+    部署 97.9 KB（SHA256 E1C7C469...）。文档新增 §6.2.15。

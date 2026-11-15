@@ -1,0 +1,68 @@
+{
+  "modmenu.nameTranslation.portallink": "下界门映射",
+  "modmenu.descriptionTranslation.portallink": "预览下界门如何跨维度连接：绘制可建门的链接范围、对端门位置与传送门编号，并标出会串门的门，避免走错目的地。",
+    "key.category.portallink.main": "下界门映射",
+  "key.categories.portallink": "传送门链接",
+  "key.portallink.toggle": "开关传送门标记",
+  "key.portallink.panel": "开关状态列表",
+  "key.portallink.config": "打开设置",
+
+  "portallink.warn.conflict": "位于 %d, %d, %d 的传送门通向 %d, %d, %d，但那边回不来——可能会串门。",
+  "portallink.warn.conflict_numbered": "#%d 传送门（%d, %d, %d）通向 #%d（%d, %d, %d），但那边回不来——可能会串门。",
+
+  "portallink.dim.overworld": "主世界",
+  "portallink.dim.nether": "下界",
+
+  "portallink.range.claims": "建此范围内 -> 链接 %d, %d, %d",
+  "portallink.range.new_gate": "此范围内将新建传送门",
+
+  "portallink.status.linked": "已链接",
+  "portallink.status.conflict": "会串门",
+  "portallink.status.will_create": "将新建",
+  "portallink.status.unknown": "未知",
+
+  "portallink.label.header": "%s",
+  "portallink.label.numbered": "#%d %s",
+  "portallink.label.partner_numbered": "-> #%d %d, %d, %d（%d 格）",
+  "portallink.label.partner": "-> %s %d, %d, %d（%d 格）",
+  "portallink.label.will_create": "-> 将在 %d, %d, %d 新建传送门",
+
+  "portallink.hud.title": "传送门：%d 个",
+  "portallink.hud.line_linked": "%s  %d,%d,%d → %d,%d,%d（%d）",
+  "portallink.hud.line_open": "%s  %d,%d,%d → %d,%d,%d",
+  "portallink.hud.line_linked_numbered": "%s  #%d  %d,%d,%d → #%d %d,%d,%d（%d）",
+  "portallink.hud.line_open_numbered": "%s  #%d  %d,%d,%d → %d,%d,%d",
+
+  "portallink.command.header": "传送门链接 - 范围内共 %d 个传送门",
+  "portallink.command.scanning": "正在扫描传送门……",
+  "portallink.command.empty": "附近没有找到下界传送门。靠近一些后执行 /portallink rescan。",
+  "portallink.command.incomplete": "另一维度未加载，链接结果可能不完整。",
+  "portallink.command.line_linked": "%s %d,%d,%d → %d,%d,%d（%d 格）",
+  "portallink.command.line_open": "%s %d,%d,%d → 无，将在 %d,%d,%d 新建",
+  "portallink.command.rescanned": "已重新扫描：%d 条链接，本维度 %d 个，另一维度 %d 个。",
+  "portallink.command.enabled": "传送门链接已开启。",
+  "portallink.command.disabled": "传送门链接已关闭。",
+
+  "portallink.config.title": "下界门映射设置",
+  "portallink.config.master": "传送门链接",
+  "portallink.config.master.on": "传送门链接：开",
+  "portallink.config.master.off": "传送门链接：关",
+  "portallink.config.master.tip": "所有标记的总开关。",
+  "portallink.config.language": "语言",
+  "portallink.config.ranges": "范围",
+  "portallink.config.labels": "标签",
+  "portallink.config.connectors": "连线",
+  "portallink.config.always_on_top": "穿透显示",
+  "portallink.config.panel": "状态列表",
+  "portallink.config.warn": "警告",
+  "portallink.config.distance": "渲染距离",
+  "portallink.config.max_portals": "最大传送门数",
+  "portallink.config.label_scale": "标签缩放",
+  "portallink.config.rescan": "重新扫描",
+  "portallink.config.footer.author": "作者：黑山大叔",
+  "portallink.config.footer.links": "bilibili.com/19428259  ·  github.com/heiheids",
+
+  "portallink.lang.auto": "跟随游戏",
+  "portallink.lang.zh_cn": "中文",
+  "portallink.lang.en_us": "英文"
+}
