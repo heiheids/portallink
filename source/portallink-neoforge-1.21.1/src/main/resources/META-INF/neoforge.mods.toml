@@ -1,0 +1,28 @@
+# Portal Link (Nether Portal Linkage Preview) - NeoForge 26.3
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "MIT"
+issueTrackerURL = "https://github.com/heiheids/portallink"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "Portal Link (Nether Portal Linkage Preview)"
+authors = "黑山大叔"
+displayURL = "https://space.bilibili.com/19428259"
+description = '''Preview how nether portals link across dimensions: draws the claim area a new portal would compete for, the partner each portal really reaches, and a stable number per portal, so you stop walking into the wrong destination.'''
+iconFile = "assets/portallink/icon.png"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"

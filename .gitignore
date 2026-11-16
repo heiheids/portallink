@@ -3,12 +3,20 @@
 /.gradle-home/
 /source/portallink/.gradle/
 /source/portallink/build/
+/source/portallink-neoforge-26.3/.gradle/
+/source/portallink-neoforge-26.3/build/
+/source/portallink-neoforge-1.21.1/.gradle/
+/source/portallink-neoforge-1.21.1/build/
 /lib-build/
 /skills_extracted/
 
 # ---- 运行与测试产物 ----
 /source/portallink/run/
 /source/portallink/build/run/
+/source/portallink-neoforge-26.3/run/
+/source/portallink-neoforge-26.3/tmp/
+/source/portallink-neoforge-1.21.1/run/
+/source/portallink-neoforge-1.21.1/tmp/
 
 # ---- 临时文件与日志 ----
 /tmp/
@@ -35,3 +43,6 @@ desktop.ini
 
 # ---- 发布产物（用 GitHub Releases 挂附件，不入库）----
 /*.zip
+
+# ---- 交付包目录（内含 zip，按用户要求放在工程内）----
+/备份/

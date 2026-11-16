@@ -772,3 +772,288 @@
     en_us.json 同步写入英文同名键，保持两文件键集合对齐。
     两个 JSON 均通过 ConvertFrom-Json 校验；解包 jar 确认新键已进产物。
     部署 97.9 KB（SHA256 E1C7C469...）。文档新增 §6.2.15。
+
+[059] 2026-11-16 02:57:28
+  备份包：backup\publish-github-1-16-3-20261116-025728.zip（1909.5 KB，109 个文件）
+  即将进行的操作：
+    1.16.3 发布完成：打包 + 推送到 GitHub。
+    1) 发布包：E:\Project\portallink\portallink-1.16.3-release.zip（333.5 KB / 73 条目）
+       含：源码（robocopy 排除 build/.gradle/run）、构建产物 portallink-1.16.3.jar、
+       README.md + PACKAGE.md（中英双语）、docs（mod_context / 运行失败复盘 / 文件读取与索引规范 / INDEX）、
+       下界门映射工程备份.txt、tools 脚本、LICENSE、.gitignore。
+       校验：关键条目 9 项全部 OK；build/、.gradle/、临时文件 均 False（无泄漏）。
+    2) 仓库：https://github.com/heiheids/portallink （PUBLIC，默认分支 master）
+       本地 2 个提交：c13a5f0（初始导入）、2da2758（发布产物 zip 不入库）
+       远端 master 与本地一致，远端 78 个文件，临时文件/toolchain/*.zip 均为 0。
+    3) 推送失败与修复（重要经验）：
+       直连 github.com:443 反复 'Recv failure: Connection was reset' 与 'Failed to connect after ~21s'，
+       而 gh 能创建仓库（走 api.github.com）→ 说明 API 通、git 通道被阻断。
+       探测发现 127.0.0.1:10808 在监听，进程为 v2rayN(PID 14804) + xray(PID 9528)，
+       但 git 未配置代理（环境变量、WinINET、git config 全为空）。
+       修复：git config http.proxy / https.proxy = socks5h://127.0.0.1:10808 → 推送立即成功。
+       判据留档：gh 能用而 git 推不上去时，先查本地代理端口与 git 的 proxy 配置，别怀疑凭据。
+
+[060] 2026-11-16 04:27:09
+  备份包：backup\neoforge-port-1-21-1-and-26-3-20261116-042708.zip（5877.2 KB，216 个文件）
+  即将进行的操作：
+    NeoForge 移植完成：新增 1.21.1 与 26.3 两个 NeoForge 工程，并已在真实实例验证。
+    新增工程：
+      source\portallink-neoforge-26.3   （NeoForge 26.3.0.103 / FML 12 / Java 25）
+      source\portallink-neoforge-1.21.1 （NeoForge 21.1.266 / FML 4.0.45 / Java 21）
+    共用 core/config/i18n/scan；差异集中在加载器胶水层与渲染层。
+    26.3：gizmo 走 RegisterDebugRenderersEvent（逐帧发，无需 persistForMillis）；
+    1.21.1：RenderLevelStageEvent + 手写 VertexConsumer + 自建 NO_DEPTH_TEST RenderType。
+    已验证（真实实例，quickPlay 进世界，日志侧机读证据）：
+      26.3-NeoForge 真实存档：authoritative=true，half=129（主世界侧）/17（下界侧），无 WARN/ERROR
+      1.21.1-NeoForge 夹具世界（数据包放门）：half=129，无 WARN/ERROR
+    修复的真实缺陷：1.21.1 工程的 neoforge.mods.toml 曾抄成 minecraft=[26.3,26.4)，
+      真实 1.21.1 实例直接拒绝加载；现由 gradle.properties 的 minecraft_version_range 展开。
+    新增 tools\launch-instance.ps1：按实例 json 直接起客户端，用于验证「部署后的 jar」。
+    未完成：本次会话截图拿不到画面（窗口纯白，渲染线程正常），视觉确认未做。
+
+[061] 2026-11-16 05:43:56
+  备份包：backup\fix-neoforge-labels-and-range-anchoring-20261116-054356.zip（2160.2 KB，209 个文件）
+  即将进行的操作：
+    修三个反馈：26.3 双范围、1.21.1 门上无文字、下界范围像在跟随。
+    1) 1.21.1 无标签（根因已实测）：DebugRenderer#renderFloatingText 自己会减相机，
+       而我把它放在 pose.translate(-cam) 里调用 → 标签落到 world-2*camera，飞出屏幕且不报错。
+       新增 [pose] 探针证明 AFTER_ENTITIES 姿势是单位阵（translation=(0,0,0)）；
+       改法：几何体在 -cam 姿势里画，标签 popPose 后用恒等姿势 + 世界坐标画；
+       区域编号 #N 一并挪进标签通道（PortalRangeRenderer.drawAreaLabels）。
+       新增 [labels] 探针：areaLabels=1 portalLabels=1 poseAtIdentity=true。
+    2) 下界范围「跟着玩家」：数据层已排除（owner/x../z.. 不随相机变）。真因是观感——
+       下界侧仅约 17 格宽，侧壁却铺满 0..256 且 alwaysOnTop 穿透地形，四面墙永远在视野里。
+       改法：侧壁裁到 ownerY-zoneDownHeight..ownerY+zoneUpHeight（默认 -4/+12，锚在门上），
+       底部加半透明地板；线框仍通高，保留「整根柱体都算」的语义。fullHeightZones=true 可回旧行为。
+       坑：改代码默认值对已有 config/portallink.json 无效，且运行中的客户端退出时会 save() 覆盖手改。
+       正确顺序：先关游戏→改 json→再启动。两实例配置已改 false 并回读确认。
+       新增 surface= 诊断字段：26.3 得 surface=-2..14（门 y=2），1.21.1 得 surface=97..113（门 y=100）。
+    3) 26.3 双范围：先排除重复发射（[rate] emit/s=29.9，同屏 30fps，每帧只跑一次），
+       再按语义收敛：RangePlanner 的「本维度兜底范围」只在对端没有任何 hasMatch 条目时才画。
+       未复现验证：用户所在位置改前改后都是 columns=1；保留 [ranges]/[entries] 供定位。
+
+[062] 2026-11-16 05:56:15
+  备份包：backup\fix-263-gizmo-text-args-20261116-055614.zip（2163.1 KB，209 个文件）
+  即将进行的操作：
+    修 26.3 区域编号不可见（billboardTextOverBlock 参数顺序），并给出双框的几何解释。
+    1) 读 26.3 反编译源码确认签名：(text, pos, ROW, color, scale)，第三个参数是行号不是颜色。
+       我把 ARGB 塞进 row → 文字被放到 1.3+row*0.2 ≈ 8.6 亿格高空，永远不可见，且不报错。
+       参考实现 realmbridge 也写错同一个地方（判据：读签名，不要读调用点）。
+       已修成 (text, pos, 0, colour, scale)，新增 [labels] 探针确认：areaLabels=1 (row=0)。
+    2) 双框的几何解释（用用户存档真实数字算）：
+       对端框中心(88,112)半=129 覆盖 x=-34..225 z=-14..245；
+       本维度兜底框中心(86,114)半=129 覆盖 x=-43..215 z=-15..243 —— 只差 9 格，
+       因为 A/8*8≈A。所以兜底框一旦画出来就与对端框几乎重合，看起来正是「一个门两个范围」。
+    3) 现在两条分支互斥（12.7 表）：对端有 hasMatch → 只画 src=other；否则只画 src=local。
+       两者不可能同时出现，因此那对重合框不会同时被画。仍属按构造排除，非复现修复。
+    4) 记录一个不可行验证手段（12.8）：离线 new BlockPos/Level 会撞 FML 引导，
+       IllegalStateException: There is no current FML Loader。不要再试纯 Java 离线跑 planner。
+
+[063] 2026-11-16 06:02:53
+  备份包：backup\dedupe-one-area-per-link-20261116-060253.zip（2165.8 KB，209 个文件）
+  即将进行的操作：
+    26.3 双框：加硬保证 onePerLinkGroup（按链接组去重）+ 运行期不变式。
+    反馈里那对框 groupKey 相同（同一条链接），只差 9 格；cutIntoBands 按组归并不会产生同组两个
+    marker，所以只能来自「对端分支 + 本维度兜底分支」。现在规划器末尾按 group 去重，
+    真实存在的门优先；渲染器加断言 [invariant]（违反才出声）。
+    两轮真机运行均无 [invariant]：[ranges] columns=1、[labels] areaLabels=1。
+    26.3 sha=7DD50E218B92，1.21.1 sha=D3FD2B09CC38，均已部署且与构建输出一致。
+
+[064] 2026-11-16 14:39:01
+  备份包：backup\remove-floor-and-inside-rule-20261116-143900.zip（2167 KB，209 个文件）
+  即将进行的操作：
+    第三轮反馈：26.3 双层 / 多余水平层 / 1.21.1 下界仍像跟随。
+    A) 26.3 双层的主因找到了：实例 mods 里还装着 realmbridge-1.0.0.jar（旧 NeoForge 参考工程），
+       它也画范围，且 baseY = floor(playerY/8)*8+4 按玩家算。两套叠加 = 两个框 + 一个会跟人的框。
+       试着禁用后 NeoForge 警告 realmbridge (1.0.0 -> MISSING)，为不擅改玩家环境已原样恢复；
+       留谁由用户决定（本模组是它的移植升级版）。
+    B) 多余水平层 = 我上一轮加的地板，已删除。根因：Y 不跨维度，主世界视角 owner 是下界门 y=2，
+       地板被放到 y=-2，玩家在 y≈-56，于是头顶 54 格多一层。且该裁剪在下界视角会算出非法带
+       （owner 主世界门 y=-62 → max(0,-66)=0 到 min(255,-50)=-50，上界低于下界）。
+       侧壁恢复整根柱体（与 Fabric 一致），移除 surfaceBottom/Top 与 fullHeightZones 对表面的作用。
+    C) 新规则：eyeInside(marker) 为真时只画线框不画半透明墙。下界 17 格宽、人几乎总在柱体内，
+       通高四面墙贴身 → 读作「贴着我走的膜」，这才是「跟着玩家跑」的来源。
+       判据 [ranges] surface=wall|wire：26.3 得 wall，1.21.1 得 wire。
+    D) 部署 sha：26.3 02F37515E746 / 1.21.1 31E506A3BF9A，均与构建输出一致；两实例零 WARN/ERROR。
+       仍未目视确认（本会话客户端窗口不呈现画面）。
+
+[065] 2026-11-16 15:38:49
+  备份包：backup\capture-frames-and-dimension-guard-20261116-153849.zip（2171 KB，209 个文件）
+  即将进行的操作：
+    第四轮：拿到真实画面，并修跨维度陈旧快照。
+    1) 新增受控截图钩子 -Dportallink.capture=N（26.3 用 Screenshot.grab(Minecraft,boolean)，
+       1.21.1 用 grab(File,RenderTarget,Consumer)），必须在客户端 tick 调用；在渲染帧中途调会截到
+       未画完的缓冲（没有 HUD）。启动器加 -ExtraJvmArguments 透传。
+       实测 26.3 禁用 realmbridge 后画面只有一套叠加，无第二层、无悬空水平面。
+    2) 26.3 双层/水平层定性：realmbridge 的 ZoneRenderer 用 baseY=floor(playerY/8)*8+4 画水平地板，
+       随玩家每 8 格跳。已禁用该 jar（可恢复），并加「检测到 realmbridge 时警告一次」。
+    3) 1.21.1 跨维度 bug：进下界后日志仍显示 group=solo:overworld@0,100,0 half=129 x=-129..130
+       （几何不随相机变，但画的是主世界门、用主世界半径，下界应约为 17）。
+       修：ClientPortalLinkState 维度变化时 reset()；RangePlanner 两条分支加维度守卫。
+    4) 夹具坑：/fill 单次上限 32768（挖洞静默失败→玩家被埋→截图全黑）；--uuid 决定 playerdata。
+       夹具两门同在 x=z=0，无法区分维度，下一轮换成坐标不同的夹具再判定守卫。
+
+[066] 2026-11-16 15:52:13
+  备份包：backup\frame-proof-263-and-dim-guards-20261116-155213.zip（2174.8 KB，211 个文件）
+  即将进行的操作：
+    第五轮：26.3 用截图证明只剩一套；1.21.1 跨维度问题缩小到一处。
+    1) 26.3：移除 realmbridge（改名 .jar.disabled 可恢复）后用 -Dportallink.capture=2 截帧，
+       画面只有我们一套：HUD + 门框 + 门上标签 + 通高线框两条竖边，无第二框、无悬空水平面。
+       结论：双层=realmbridge 叠加；水平层=它按玩家 Y 算的 baseY 地板 + 我们已删的地板。
+    2) 截图要点：Screenshot.grab 必须在客户端 tick 调（拿到上一帧完整画面含 HUD），
+       在渲染阶段中途调会截到半帧；首次截图要延到 12 秒，等首次扫描落地。
+    3) 1.21.1：已加「维度变化 reset()」与「规划器维度守卫」两处，编译部署通过，但仍未拦住——
+       下界日志依旧 agent=overworld@0,100,0 half=129。下一轮在 PortalScanService.build 返回前
+       打印 sourceDim/source.dimension()/other.dimension() 三者即可定位。
+    4) 夹具坑：旧世界残留门导致误判；数据包 init 换坐标放门未生效；/fill 上限 32768。
+
+[067] 2026-11-16 16:14:52
+  备份包：backup\nether-fix-three-guards-20261116-161451.zip（2177 KB，211 个文件）
+  即将进行的操作：
+    收尾：1.21.1 下界问题定性并修好。
+    1) 新增 [scan] 日志打印 sourceDim/source.dimension()/other.dimension()，证明扫描维度是对的
+       （下界扫描得 the_nether(1 found)，entries 属本维度）。
+    2) 真正的乱跑来源是「传送瞬间仍在画上一维度的快照」：16:05:51 在下界画了 overworld half=129
+       的 257 格框，4 秒后自动纠正为 the_nether half=17。
+    3) 三道守卫：ClientPortalLinkState 维度变化 reset()；RangePlanner 两分支校验 entry.dimension()；
+       PortalWorldRenderer 渲染前丢弃 sourceDim!=当前维度的快照（关键，不依赖扫描时机）。
+       复测 16:10:57 主世界 → 16:11:22 下界直接 the_nether half=17，无错帧。
+    4) 几何固定性有日志证明：玩家 45→52→36 三次位移，x=23..58 z=23..57 一格未变。
+    5) 夹具真坑：下界区块未加载时 setblock 必失败（先 tp 再放）；gradle runServer 的 stdin 命令
+       不下发；BindException 只出现在 tmp\srv-out.log。
+
+[068] 2026-11-16 18:01:00
+  备份包：backup\double-sided-walls-both-views-20261116-180100.zip（2178.3 KB，211 个文件）
+  即将进行的操作：
+    第六轮：内部看不到颜色 + 下界仍在移动（同一原因）。
+    1) 上一轮为解决"贴身罩子"加的 eyeInside 抑制规则有副作用：下界 17 格宽玩家几乎总在里面 →
+       永远只画线框（看不到颜色）；且跨边界时面整片出现/消失，比框移动更像"跟着我跑"。
+       已删除该规则（两工程），墙永远画。
+    2) 26.3 的 Gizmos.rect fill 只发单绕序，背面被剔除 → 内部看不到。改成每面发两次相反绕序。
+       1.21.1 本就用 quadBothSides，只需删抑制。
+    3) 证据：26.3 下界柱体内 walls=both + 截图整片橙色墙面；1.21.1 主世界同；
+       1.21.1 下界玩家 52→36 位移 16 格，x=23..58 z=23..57 完全不变（框固定）。
+    4) [ranges] 末尾 surface=wall|wire 改为 walls=both|off。
+    5) 夹具补遗：传送点抬到安全高度、开 doImmediateRespawn，否则截图全是死亡界面。
+
+[069] 2026-11-16 19:23:15
+  备份包：backup\poi-cap-and-wall-fade-20261116-192315.zip（2181.8 KB，211 个文件）
+  即将进行的操作：
+    第七轮：1.21.1 崩溃根因（POI 强制加载 256 格）+ 墙面距离衰减。
+    1) 崩溃/卡死根因：ServerPortalScanner 里 poiManager.ensureLoadedAndValid(center, radius=256)
+       会同步加载生成约 1000 个区块，且每次扫描都做、跑在服务端线程 → 单次 3.5 秒，
+       日志 Can't keep up! Running 3524ms or 70 ticks behind，表现为卡死/崩溃。
+       修：强制加载半径限幅 POI_ENSURE_RADIUS=48（搜索半径不变，远处未加载只是 complete=false）。
+       实测：修前 3.5 秒/次，修后 0 ms/次，Can't keep up 计数 0。新增 [scan] 耗时字段作常驻判据。
+    2) 「还在移动」：同会话 [ranges] 只打印一次 → 几何从未变化；上一轮夹具三点位移也证明坐标不动。
+       真因是四面墙无远近差异、整片包住视野，像贴脸的膜。修：每面墙按相机距离衰减 alpha
+       （近处原值、远处约 1/4，WALL_FADE_BLOCKS=24），产生视差。两工程都改。
+    3) 附带发现：用户世界有两对门，两个下界框 x 重叠（12..47）、z 相差十几格，可能互相干扰观感。
+
+[070] 2026-11-16 19:57:05
+  备份包：backup\label-clamp-and-constant-alpha-20261116-195705.zip（2183.2 KB，211 个文件）
+  即将进行的操作：
+    第八轮：修 #3 标签掉到地底，并撤掉透明度衰减。
+    1) #3 在范围下方的原因：areaLabel 用 marker.ownerPos().getY()+2（门自己的 Y）。跨维度时很错：
+       下界范围的主人是主世界门 y=-62 → 标签放到 y=-60，而该维度底部是 0，数字掉到地底。
+       修：labelY 把 Y 夹进 band 并跟随视线（bottomY+2..topY-2 内取 eye.y+2）。下界带 1..255、
+       玩家 48.5 → 标签 50.5，回到视野里。
+    2) 撤掉上一轮的距离衰减：不透明度随移动变化，本身就被读成"在动"。改回统一 zoneWallAlpha。
+    3) 几何静止已由日志确认：三次下界采样 x=-14..20 z=-12..23 完全一致（玩家移动 35 格）。
+       若仍觉移动，需区分"平移"还是"忽隐忽现"。
+    4) 日志里 swiftmap 的 ClosedByInterrupt/ClosedChannel 与 ironfarm 统计是其它模组噪音。
+
+[071] 2026-11-16 20:42:47
+  备份包：backup\label-belongs-here-20261116-204247.zip（2185 KB，211 个文件）
+  即将进行的操作：
+    第九轮：#3 巨大已修；「框水平平移」缩小到渲染层相机处理。
+    1) #3 巨大的原因：上一轮把标签 Y 改成跟随视线（clamp(eye.y+2)），而标签位于范围中心，
+       人走到中心就等于把字贴脸上。修：标签回到 marker.ownerPos().getY()+2，且新增
+       labelBelongsHere（主人高度必须落在本维度带内才画）；跨维度范围不画世界内编号，
+       状态栏已给出编号信息。
+    2) 框水平平移：用户日志三次采样（19:44:19 / 19:45:06 / 20:32:31）位置各异但
+       x=-14..20 z=-12..23 完全一致 → 几何数据不动，问题在渲染层相机处理。
+       已排除：规划器跟随、明暗变化、陈旧快照。待验证：相机平移是否被应用两次。
+       需要的观察：站在框外不动只转视角，看框边缘相对地形是否固定。
+
+[072] 2026-11-16 21:22:24
+  备份包：backup\ab-proof-and-wall-guides-20261116-212224.zip（2187.8 KB，211 个文件）
+  即将进行的操作：
+    第十轮：A/B 实测证明框没有跟着相机走。
+    1) 方法：夹具把相机放 A(45,58,45) 与 B(35,58,55)，同朝向，模组自截帧，比较橙色叠加层横向重心。
+       结果 centroidX 686 → 647（移动约 33 像素）。若框黏相机则不应移动 → 证明顶点在世界坐标里正确反向偏移。
+       （同位置几帧 686→680 的漂移是玩家被 tp 到空中后下落导致视线高度变化。）
+    2) 「看起来平移」的原因：382 格通高、257 格宽的半透明盒子 + alwaysOnTop 穿透地形，屏幕上只有四片
+       没有边界的色块，缺少静止参照物，走动时的透视变化被读成墙在滑。
+       修：墙面每 8 格加一根世界固定的竖向导引线（GUIDE_SPACING=8），两工程都加。
+    3) 夹具 bug：captureIfDue 原先只判 level!=null，而地形加载中 level 已存在，截图落在加载画面。
+       改为「快照非空」才允许截图。这解释了前几轮截图与日志对不上的现象。
+
+[073] 2026-11-16 21:44:25
+  备份包：backup\d2-camera-check-and-regression-fix-20261116-214425.zip（2189.9 KB，211 个文件）
+  即将进行的操作：
+    第十一轮：读 playbook 确认 D2；修掉自己造成的回归（主世界也开始动）。
+    1) 回归原因：为做 A/B 我把 manualCameraOffset 写成 false 并留在实例配置里，几何完全不减相机，
+       主世界相机 XZ 大 → 整体偏移 → 主世界也开始动。已改回 true 并部署。
+    2) playbook silent-failures.md D2 正好描述此现象：26.x gizmo 引擎自己减相机（不要自己减）；
+       1.21.1 AFTER_ENTITIES 是单位阵（必须自己减）；BEFORE_ENTITIES 已含相机（不要再减）。
+       判据：提交坐标与 camera 的差若等于相机位置，就是多减了一次。
+       这解释了旧矛盾：多减一次的偏移量=相机位置，主世界 XZ 大→框飞出视野显得"不动"，
+       下界 XZ 接近 0→偏移小→框仍在视野里但位置偏，显得"在平移"。
+    3) 本工程用 AFTER_ENTITIES + 自减，与 D2 第二行一致；[pose] 实测 translation=(0,0,0) 支持该结论。
+    4) 新增常驻诊断 [submit] manualOffset=… first-marker=(x,y,z) cam=(cx,cy,cz)，一行判定 D2。
+    5) 下一步判据：下界走动时抓连续 [ranges]，若 owner 变化 → 门集合抖动（数据层）；
+       若 owner 不变仍在动 → 渲染层，继续按 D2 查。
+
+[074] 2026-11-16 21:50:54
+  备份包：backup\d2-verified-rescan-48-20261116-215054.zip（2191.6 KB，211 个文件）
+  即将进行的操作：
+    第十二轮：用 playbook D2 判据实测，排除相机多减；定位到数据层门集合抖动。
+    1) 回归修复：manualCameraOffset 被我在 A/B 时写成 false 并留在配置，导致主世界也不减相机而移动。
+       已改回 true 并部署。
+    2) D2 判据实测（新增 [submit] 诊断）：
+       [submit] manualOffset=true first-marker=(-14,1.0,-12) cam=(-16.48,35.00,-28.58)
+       提交坐标=世界坐标（与 [ranges] x=-14..20 一致）；与相机之差=(2.5,-34,16.6) 不等于相机位置；
+       姿势栈 translation=(0,0,0)。⇒ 相机只减一次，变换正确，渲染层排除。
+    3) 剩下的是数据层：用户世界有两对门，扫描窗口以玩家为中心，走动时窗边门进出导致 owner 切换，
+       框在两处间跳 = 读作"整体平移"。
+       缓解：RESCAN_DISTANCE 16 → 48（原值等于 vanilla 搜索步长，窗口十几格就重算）。扫描已 0~1ms，放宽无风险。
+    4) 下一步判据：走动时连续 [ranges]，owner 变化 = 数据层（下一轮加滞回锁定）；owner 不变 = 回渲染层。
+
+[075] 2026-11-16 22:05:33
+  备份包：backup\use-main-camera-like-ironfarm-20261116-220533.zip（2193.3 KB，211 个文件）
+  即将进行的操作：
+    第十三轮：读 ironfarm 字节码，发现相机来源取错（event.getCamera vs gameRenderer.getMainCamera）。
+    1) 参考 heiheids/iron-farm-design-wheelchair（实例里就装着同版本 jar），反编译 WorldOverlayRenderer：
+       getMainCamera().getPosition().toVector3f()，三次 fneg → translate(-cam)，画世界坐标，popPose，flush。
+       renderGolemDetectBoxes 直接用 BlockPos3 绝对坐标，不减相机。
+       结论：结构与本工程一致，唯一差异是相机来源。
+    2) 实测两个来源不同：event.getCamera() → (3.5,42.6,-0.2)；getMainCamera() → (4.8,42.6,-1.2)，
+       X/Z 差约 1.3/1.0 格。减掉一个与引擎实际值不同的相机 = 给每个顶点加固定偏移，随移动而变
+       = 观感上的「整体水平平移」。
+    3) 修：两处相机读取全部改为 client.gameRenderer.getMainCamera()，与 ironfarm 一致。
+       运行 errs=0，[submit] 与 [ranges] 坐标一致。
+    4) 教训：同版本同阶段且真机正常的邻居模组是最高优先级参考；该差异只有对比字节码才现形。
+
+[076] 2026-11-16 22:18:02
+  备份包：backup\dual-convention-reference-box-20261116-221802.zip（2195.1 KB，211 个文件）
+  即将进行的操作：
+    第十四轮：加双约定对照框（橙色=改姿势，白色=改坐标），把观感问题变成二选一。
+    1) 背景：几何数据恒定、D2 判据排除多减、相机来源已对齐 ironfarm，用户仍报整体平移；
+       本环境无输入通道无法自己走动观察，继续推理只是猜。
+    2) 做法：同一组棱边画两遍。橙色=世界坐标+translate(-eye)（现有实现）；白色=坐标预减 eye+单位阵。
+       数学等价，都正确则完全重合。配置项 compareCameraModes（默认 true，诊断用，可关）。
+       实现：白色框画在 popPose 之后，单位阵 + world-eye，同一条 RenderType.lines。
+    3) 实测 errs=0，截图可见 8 格导引线与白色对照棱边同时出现。
+    4) 待用户回答：走动时是橙动、白动、还是两者一起动 —— 直接定位到姿势错/坐标错/都被再补一次。
+
+[077] 2026-11-16 22:30:20
+  备份包：backup\twin-box-diagnostic-20261116-223020.zip（2195.8 KB，211 个文件）
+  即将进行的操作：
+    第十五轮：把双约定对照框做成可观测的自诊断（橙色=改姿势，白色=改坐标）。
+    1) 新增 compareCameraModes（默认 true，诊断用）：同一组棱边再画一遍白色线框，坐标预减 camera、
+       使用独立单位阵；正常叠加层仍用世界坐标 + translate(-eye)。两者数学等价，都正确则完全重合。
+    2) 实现位置：PortalVerification.drawTwin（自带 PoseStack），PortalRangeRenderer 只保留 edges/walls/guides。
+       顺带把 PortalWorldRenderer 回到 300 行、索引 0 违规。
+    3) 运行 errs=0；截图可见橙色 8 格导引线与白色对照棱边同时出现。
+    4) 待用户回答：走动时橙动/白动/两者一起动 → 直接定位姿势错、坐标错、还是引擎再补一次相机。

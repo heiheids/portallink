@@ -1,8 +1,19 @@
 # Portal Link / 传送门链接
 
-Preview Nether portal linkage in Minecraft **26.3** (Fabric).
+Preview Nether portal linkage in Minecraft **26.3 (Fabric)** and **NeoForge** (Minecraft **1.21.1** and **26.3**).
 
 预览下界传送门的链接关系，避免"串门"——传送过去却被送到另一个传送门那边。
+
+## 三个构建目标 / Three build targets
+
+| 目标 | 目录 | 产物 |
+| --- | --- | --- |
+| Fabric 26.3 | `source\portallink` | `portallink-1.16.4.jar` |
+| NeoForge 26.3 | `source\portallink-neoforge-26.3` | `portallink-26.3-neoforge-1.16.4.jar` |
+| NeoForge 1.21.1 | `source\portallink-neoforge-1.21.1` | `portallink-1.21.1-neoforge-1.16.4.jar` |
+
+三个目标共用同一套 `core/`（链接算法）、配置、传送门编号与扫描策略，差别只在加载器胶水层与渲染层。
+构建方法、版本坐标与实测结论见 `docs\mod_context.md` 第 11 节。
 
 ---
 
